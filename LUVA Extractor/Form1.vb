@@ -1,6 +1,7 @@
 ﻿Imports GdPicture14
 
 Public Class Form1
+    Dim stringArr As String()
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         GDLicense()
