@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Runtime.Remoting
 Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
@@ -79,17 +80,24 @@ Public Class Form1
             'Hardcode
 
             If koorXWord >= xAchse And koorXWord <= xAchse + 152 And koorYWord >= yAchse And koorYWord <= yAchse + 55 Then
+
                 If koorYWord > yAchseVorgaenger + 5 Then
                     writer.WriteLine("")
                 End If
                 writer.Write(zeileWort(8) + " ")
                 yAchseVorgaenger = koorYWord
-
+                konkat += zeileWort(8).Replace("(", "").Replace(")", "") + " "
             End If
 
 
+
         Next
+        writer.WriteLine("")
+        writer.WriteLine(konkat)
+        Dim Ergebnis As String = checkAdresse(konkat)
+        writer.WriteLine(Ergebnis)
         writer.Close()
+
         'Dim _tempOCRDataStruct As OCRDataStruct
         'With _tempOCRDataStruct
         '    .Coord = New Rectangle()
