@@ -28,6 +28,10 @@ Partial Class Form1
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.VorherTB = New System.Windows.Forms.TextBox()
+        Me.NachherTB = New System.Windows.Forms.TextBox()
         Me.SuspendLayout()
         '
         'OpenFileDialog1
@@ -51,20 +55,61 @@ Partial Class Form1
         Me.ComboBox1.Size = New System.Drawing.Size(410, 21)
         Me.ComboBox1.TabIndex = 1
         '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(467, 309)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(41, 13)
+        Me.Label1.TabIndex = 2
+        Me.Label1.Text = "Vorher "
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(467, 338)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(48, 13)
+        Me.Label2.TabIndex = 3
+        Me.Label2.Text = "Nachher"
+        '
+        'VorherTB
+        '
+        Me.VorherTB.Location = New System.Drawing.Point(518, 306)
+        Me.VorherTB.Name = "VorherTB"
+        Me.VorherTB.Size = New System.Drawing.Size(128, 20)
+        Me.VorherTB.TabIndex = 4
+        '
+        'NachherTB
+        '
+        Me.NachherTB.Location = New System.Drawing.Point(518, 335)
+        Me.NachherTB.Name = "NachherTB"
+        Me.NachherTB.Size = New System.Drawing.Size(128, 20)
+        Me.NachherTB.TabIndex = 5
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.NachherTB)
+        Me.Controls.Add(Me.VorherTB)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.ComboBox1)
         Me.Controls.Add(Me.Button1)
         Me.Name = "Form1"
         Me.Text = "Form1"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents Button1 As Button
     Friend WithEvents ComboBox1 As ComboBox
+    Friend WithEvents Label1 As Label
+    Friend WithEvents Label2 As Label
+    Friend WithEvents VorherTB As TextBox
+    Friend WithEvents NachherTB As TextBox
 End Class

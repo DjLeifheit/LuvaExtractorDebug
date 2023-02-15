@@ -1,21 +1,39 @@
 ﻿Imports System.IO
 Imports System.Runtime.Remoting
+Imports System.Text.RegularExpressions
+Imports System.Xml.XPath
 Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
     Dim listSKriterien() As String
     Dim stringArrWEG(21) As String
+    Dim dataSetFiltered As System.Data.DataSet
+    Dim MyConnection As System.Data.OleDb.OleDbConnection
+    Dim MyCommand As System.Data.OleDb.OleDbDataAdapter
+    Dim path As String = "O:\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx"
     Dim dataSet As System.Data.DataSet
+    Dim table As System.Data.DataTable
     Dim Excel As New Microsoft.Office.Interop.Excel.Application
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
-        GDLicense()
-        datatable()
-
+        table = New System.Data.DataTable
+        table.Columns.Add("Nr#")
+        table.Columns.Add("Objekt")
+        table.Columns.Add("plz")
+        table.Columns.Add("ort")
+        table.Columns.Add("etv")
+        table.Columns.Add("ob")
+        table.Columns.Add("bh")
+        table.Columns.Add("iban")
+        table.Columns.Add("bic")
+        dataSetFiltered = New System.Data.DataSet
+        'GDLicense()
+        dataSetFiltered.Tables.Add(table)
+        MyConnection = New System.Data.OleDb.OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties=Excel 12.0;")
         ' extractObject("O:\LUVA Verwaltungs GmbH\Testdaten_Produktion\2_DTFSD_01-13-2023_53.pdf")
-
+        datatable()
+        dataSetAnpassen()
 
     End Sub
 
@@ -89,8 +107,6 @@ Public Class Form1
                 konkat += zeileWort(8).Replace("(", "").Replace(")", "") + " "
             End If
 
-
-
         Next
         writer.WriteLine("")
         writer.WriteLine(konkat)
@@ -120,10 +136,6 @@ Public Class Form1
 
     End Sub
     Private Sub datatable()
-        Dim MyConnection As System.Data.OleDb.OleDbConnection
-        Dim MyCommand As System.Data.OleDb.OleDbDataAdapter
-        Dim path As String = "O:\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx"
-        MyConnection = New System.Data.OleDb.OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties=Excel 12.0;")
         MyCommand = New System.Data.OleDb.OleDbDataAdapter("select * from [Tabelle1$]", MyConnection)
         dataSet = New System.Data.DataSet
         MyCommand.Fill(dataSet)
@@ -141,13 +153,92 @@ Public Class Form1
             Dim valOrt As String = Row(3).ToString()
             If text.Contains(valStr) And text.Contains(valOrt) Then
                 Return Row(6).ToString
+            Else
+                Dim msg As MessageBox
+                'msg.
+                'Return 0
             End If
-
 
         Next
     End Function
 
-    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+    Function ifNothingFound(text As String)
+        Dim splitText As String()
 
+        text = text.Replace("str\.|Str\.", "straße")
+        text = Regex.Replace(text, "\d", "")
+        'Dim sb As New System.Text.StringBuilder
+        'For Each c As Char In text
+        '    If Not Char.IsDigit(c) Then sb.Append(c)
+        'Next
+        splitText = text.Split(" ")
+        For s As Integer = 0 To splitText.Length - 1
+            If splitText(s) <= 3 Then
+                splitText(s) = ""
+
+
+            End If
+        Next
+        For Each s As String In splitText
+            Dim sqlConcat As String = "Select dm From [Tabelle1$] Where Objekt LIKE " + s
+        Next
+    End Function
+
+    Function dataBaseConnection()
+        Dim MyConnection As System.Data.OleDb.OleDbConnection
+        Dim MyCommand As System.Data.OleDb.OleDbDataAdapter
+        Dim path As String = "O:\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx"
+        MyConnection = New System.Data.OleDb.OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties=Excel 12.0;")
+        MyCommand = New System.Data.OleDb.OleDbDataAdapter("select * from [Tabelle1$]", MyConnection)
+        Return MyConnection
+    End Function
+
+    Sub dataSetAnpassen()
+        Dim anzahlRows As Int32 = dataSet.Tables(0).Rows.Count()
+        VorherTB.Text = anzahlRows
+        For Each Row As DataRow In dataSet.Tables(0).Rows
+            Dim valStr As String = Row(1).ToString()
+            valStr = Regex.Replace(valStr, "str\.|Str\.", "straße")
+            valStr = Regex.Replace(valStr, "[0-9][a-z]\-", "00")
+            valStr = Regex.Replace(valStr, "\,|\+", "00")
+            valStr = Regex.Replace(valStr, "\-[0-9]", "00")
+            valStr = Regex.Replace(valStr, "\/[0-9]", "00")
+            valStr = Regex.Replace(valStr, "\d", "  ")
+            valStr = Regex.Replace(valStr, "\s[a-z]\s", " ")
+            valStr = Regex.Replace(valStr, "\s\s[a-z]", " ")
+            If valStr.Contains("/") Then
+                Dim strasseSplit = valStr.Split("/")
+                Dim RowAdd As DataRow = dataSetFiltered.Tables(0).NewRow()
+                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                    RowAdd(Coll.ColumnName) = Row(Coll.ColumnName)
+                Next
+                RowAdd(1) = strasseSplit(1)
+                Row(1) = strasseSplit(0)
+                Dim Rowst As DataRow = dataSetFiltered.Tables(0).NewRow()
+                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                    Rowst(Coll.ColumnName) = Row(Coll.ColumnName)
+                Next
+                dataSetFiltered.Tables(0).Rows.Add(Rowst)
+                dataSetFiltered.Tables(0).Rows.Add(RowAdd)
+            Else Row(1) = valStr
+                Dim Rowst As DataRow = dataSetFiltered.Tables(0).NewRow()
+                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                    Rowst(Coll.ColumnName) = Row(Coll.ColumnName)
+                Next
+                dataSetFiltered.Tables(0).Rows.Add(Rowst)
+            End If
+
+        Next
+        Dim writer As TextWriter = New StreamWriter("C:\Users\vincent.rieker\source\repos\Luva Extractor\objektlisteTest.csv")
+        For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
+            For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                writer.Write(Row(Coll.ColumnName).ToString + ",")
+            Next
+            writer.WriteLine()
+        Next
+        writer.Close()
+        NachherTB.Text = ComboBox1.Items.Count
     End Sub
+
+
 End Class
