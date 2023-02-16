@@ -199,15 +199,31 @@ Public Class Form1
         For Each Row As DataRow In dataSet.Tables(0).Rows
             Dim valStr As String = Row(1).ToString()
             valStr = Regex.Replace(valStr, "str\.|Str\.", "straße")
-            valStr = Regex.Replace(valStr, "[0-9][a-z]\-", "00")
-            valStr = Regex.Replace(valStr, "\,|\+", "00")
+            valStr = Regex.Replace(valStr, "[0-9][A-z]\-|[0-9]\s[A-z]\-", "00")
+            valStr = Regex.Replace(valStr, "\,\s[0-9]|\+", "00")
             valStr = Regex.Replace(valStr, "\-[0-9]", "00")
             valStr = Regex.Replace(valStr, "\/[0-9]", "00")
             valStr = Regex.Replace(valStr, "\d", "  ")
             valStr = Regex.Replace(valStr, "\s[a-z]\s", " ")
-            valStr = Regex.Replace(valStr, "\s\s[a-z]", " ")
+            valStr = Regex.Replace(valStr, "\s\s[A-z][A-z][A-z]|\s\s[A-z][A-z]|\s\s[A-z]", " ")
+            valStr = Regex.Replace(valStr, "\s\s[A-z][A-z][A-z][A-z]", "")
+
             If valStr.Contains("/") Then
                 Dim strasseSplit = valStr.Split("/")
+                Dim RowAdd As DataRow = dataSetFiltered.Tables(0).NewRow()
+                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                    RowAdd(Coll.ColumnName) = Row(Coll.ColumnName)
+                Next
+                RowAdd(1) = strasseSplit(1)
+                Row(1) = strasseSplit(0)
+                Dim Rowst As DataRow = dataSetFiltered.Tables(0).NewRow()
+                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                    Rowst(Coll.ColumnName) = Row(Coll.ColumnName)
+                Next
+                dataSetFiltered.Tables(0).Rows.Add(Rowst)
+                dataSetFiltered.Tables(0).Rows.Add(RowAdd)
+            ElseIf (valStr.Contains(",")) Then
+                Dim strasseSplit = valStr.Split(",")
                 Dim RowAdd As DataRow = dataSetFiltered.Tables(0).NewRow()
                 For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
                     RowAdd(Coll.ColumnName) = Row(Coll.ColumnName)
