@@ -162,7 +162,7 @@ Public Class Form1
     'Checkt ob die Adresse (Straße und Wohnort) in dieser Kombination in der Datenbank vorhanden ist
     'Funktion: Reverse Check prüft ob in der Adresse der Pdf straße und und Ort die in der Datenbank hinterlegt sind in dieser Konstelation vorhanden sind
     'wenn das nicht der Fall ist wird die gefilterte Variante geprüft 
-    Private Function checkAdresse(text As String)
+    Public Function checkAdresse(text As String)
         For Each Row As DataRow In dataSet.Tables(0).Rows
             Dim valStr As String = Row(1).ToString()
             Dim valOrt As String = Row(3).ToString()
@@ -179,7 +179,7 @@ Public Class Form1
     'Variante 1 wenn keine Straße gefunden wurde zu der Adresse aus der PDF dann wird das ganze nochmal geprüft
     'nur dass über die Daten aus der Pdf als auch der Daten der Tabelle ein Filter gelegt wird sodass auch ähnlichkeiten schon zu einem Treffer führen
     'wenn mehrere Treffer gefunden wurden muss der User selbst wählen welcher Eintrag der richtige ist
-    Function ifNothingFoundFilter(Text As String)
+    Public Function ifNothingFoundFilter(Text As String)
         Dim dataTableAfterF As System.Data.DataTable
         dataTableAfterF = New System.Data.DataTable
         dataTableAfterF.Columns.Add("Nr#")
@@ -250,7 +250,7 @@ Public Class Form1
             formCheck.arrayRow = arrayRow
         End If
     End Function
-    Function ifNothingFoundSQL(text As String)
+    Public Function ifNothingFoundSQL(text As String)
         Dim Filterused As String = ""
 
         For Each Filter As String In stadtFilterHSet
@@ -305,7 +305,7 @@ Public Class Form1
     '   Str. und str. wird zu straße
     '   Wenn 2 Straßen in einer Zeile vorhanden sind (Bsp Berliner Straße 109/Gugenmusweg 1 (Nr.143) oder Wieslocher Straße 3, Schulstraße 18 (Nr.209))
     '   wird gesplittet und die 2 Straße in eine neue Zeile geschrieben alle anderen Daten werden übernommen
-    Sub dataSetAnpassen()
+    Public Sub dataSetAnpassen()
         Dim anzahlRows As Int32 = dataSet.Tables(0).Rows.Count()
         VorherTB.Text = anzahlRows
         For Each Row As DataRow In dataSet.Tables(0).Rows
