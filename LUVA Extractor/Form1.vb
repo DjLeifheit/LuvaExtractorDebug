@@ -20,6 +20,7 @@ Public Class Form1
     Dim dataSetAfterF As System.Data.DataSet
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim TextTest As String = "Bahnhofstr. 96 69151 Neckargemünd"
         table = New System.Data.DataTable
         table.Columns.Add("Nr#")
         table.Columns.Add("Objekt")
@@ -39,6 +40,8 @@ Public Class Form1
         ' extractObject("O:\LUVA Verwaltungs GmbH\Testdaten_Produktion\2_DTFSD_01-13-2023_53.pdf")
         datatable()
         dataSetAnpassen()
+        erstellenStadtFilter()
+        ifNothingFoundFilter(TextTest)
 
     End Sub
 
@@ -192,7 +195,7 @@ Public Class Form1
         dataTableAfterF.Columns.Add("iban")
         dataTableAfterF.Columns.Add("bic")
         dataSetAfterF.Tables.Add(dataTableAfterF)
-        Text = Text.Replace("str\.|Str\.", "straße")
+        Text = Regex.Replace(Text, "str\.|Str\.", "straße")
         Text = Regex.Replace(Text, "\d", "")
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
             Dim hilfsstringStrasse As String = Row(1).ToString.Trim()
@@ -202,6 +205,7 @@ Public Class Form1
                 For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
                     RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
                 Next
+                dataSetAfterF.Tables(0).Rows.Add(RowNew)
             End If
         Next
         If dataSetAfterF.Tables(0).Rows.Count > 1 Then
