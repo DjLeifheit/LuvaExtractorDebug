@@ -32,6 +32,7 @@ Partial Class Form1
         Me.Label2 = New System.Windows.Forms.Label()
         Me.VorherTB = New System.Windows.Forms.TextBox()
         Me.NachherTB = New System.Windows.Forms.TextBox()
+        Me.TextBox2 = New System.Windows.Forms.TextBox()
         Me.SuspendLayout()
         '
         'OpenFileDialog1
@@ -40,9 +41,9 @@ Partial Class Form1
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(306, 164)
+        Me.Button1.Location = New System.Drawing.Point(26, 382)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(169, 53)
+        Me.Button1.Size = New System.Drawing.Size(169, 20)
         Me.Button1.TabIndex = 0
         Me.Button1.Text = "Button1"
         Me.Button1.UseVisualStyleBackColor = True
@@ -50,7 +51,7 @@ Partial Class Form1
         'ComboBox1
         '
         Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(12, 301)
+        Me.ComboBox1.Location = New System.Drawing.Point(26, 408)
         Me.ComboBox1.Name = "ComboBox1"
         Me.ComboBox1.Size = New System.Drawing.Size(410, 21)
         Me.ComboBox1.TabIndex = 1
@@ -58,7 +59,7 @@ Partial Class Form1
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(467, 309)
+        Me.Label1.Location = New System.Drawing.Point(598, 389)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(41, 13)
         Me.Label1.TabIndex = 2
@@ -67,7 +68,7 @@ Partial Class Form1
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(467, 338)
+        Me.Label2.Location = New System.Drawing.Point(598, 416)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(48, 13)
         Me.Label2.TabIndex = 3
@@ -75,23 +76,34 @@ Partial Class Form1
         '
         'VorherTB
         '
-        Me.VorherTB.Location = New System.Drawing.Point(518, 306)
+        Me.VorherTB.Location = New System.Drawing.Point(670, 382)
         Me.VorherTB.Name = "VorherTB"
         Me.VorherTB.Size = New System.Drawing.Size(128, 20)
         Me.VorherTB.TabIndex = 4
         '
         'NachherTB
         '
-        Me.NachherTB.Location = New System.Drawing.Point(518, 335)
+        Me.NachherTB.Location = New System.Drawing.Point(670, 409)
         Me.NachherTB.Name = "NachherTB"
         Me.NachherTB.Size = New System.Drawing.Size(128, 20)
         Me.NachherTB.TabIndex = 5
+        '
+        'TextBox2
+        '
+        Me.TextBox2.Location = New System.Drawing.Point(60, 43)
+        Me.TextBox2.Multiline = True
+        Me.TextBox2.Name = "TextBox2"
+        Me.TextBox2.ReadOnly = True
+        Me.TextBox2.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.TextBox2.Size = New System.Drawing.Size(717, 293)
+        Me.TextBox2.TabIndex = 7
         '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.TextBox2)
         Me.Controls.Add(Me.NachherTB)
         Me.Controls.Add(Me.VorherTB)
         Me.Controls.Add(Me.Label2)
@@ -112,4 +124,5 @@ Partial Class Form1
     Friend WithEvents Label2 As Label
     Friend WithEvents VorherTB As TextBox
     Friend WithEvents NachherTB As TextBox
+    Friend WithEvents TextBox2 As TextBox
 End Class

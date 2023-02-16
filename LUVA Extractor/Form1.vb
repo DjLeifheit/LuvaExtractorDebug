@@ -245,15 +245,18 @@ Public Class Form1
             End If
 
         Next
-        Dim writer As TextWriter = New StreamWriter("C:\Users\vincent.rieker\source\repos\Luva Extractor\objektlisteTest.csv")
+        '  Dim writer As TextWriter = New StreamWriter("C:\Users\vincent.rieker\source\repos\Luva Extractor\objektlisteTest.csv")
+
+        Dim ShowTable As String
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
+            Dim hilfsstring As String = ""
             For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
-                writer.Write(Row(Coll.ColumnName).ToString + ",")
+                hilfsstring += Row(Coll.ColumnName).ToString & vbTab
             Next
-            writer.WriteLine()
+            ShowTable += hilfsstring + Environment.NewLine
+
         Next
-        writer.Close()
-        NachherTB.Text = ComboBox1.Items.Count
+        TextBox2.Text = ShowTable
     End Sub
 
 
