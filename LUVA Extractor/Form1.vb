@@ -434,8 +434,7 @@ Public Class Form1
     Sub zuordnungPDF(pathPDF As String, ziel As String)
         OpenFileDialog1.FileName = pathPDF
         Dim pdf_name As String = OpenFileDialog1.SafeFileName
-        Dim pathzielordner As String = My.Resources.StandardPath + "\"
-        pathzielordner += ziel
+        Dim pathzielordner As String = My.Resources.StandardPath + "\" + ziel
         Try
             Directory.CreateDirectory(pathzielordner)
         Catch ex As Exception
@@ -446,7 +445,7 @@ Public Class Form1
 
     End Sub
     Sub loadPDf()
-        FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDF
+        FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         FolderBrowserDialog1.ShowDialog()
         Dim konkat As String
         Dim FolderPDF As String = FolderBrowserDialog1.SelectedPath
@@ -457,7 +456,9 @@ Public Class Form1
             If konkat.Equals("") Then
             Else
                 Ziel = checkAdresse(konkat)
-                zuordnungPDF(s, Ziel)
+                If Not Ziel.Equals("") Then
+                    zuordnungPDF(s, Ziel)
+                End If
             End If
 
 
