@@ -6,13 +6,13 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
+    Dim standardFilter As String() = {"WEG"}
+    Dim zielordner As String = ""
     Dim stadtFilterHSet As HashSet(Of String) = New HashSet(Of String)
-    Dim listSKriterien() As String
-    Dim stringArrWEG(21) As String
     Dim dataSetFiltered As System.Data.DataSet
     Dim MyConnection As System.Data.OleDb.OleDbConnection
     Dim MyCommand As System.Data.OleDb.OleDbDataAdapter
-    Dim path As String = "O:\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx"
+    Dim path As String = "O:\LUVA Verwaltungs GmbH\Testdaten\Kopie von objektliste neu.xlsx"
     Dim dataSet As System.Data.DataSet
     Dim table As System.Data.DataTable
     Dim dataSetErgebnisSQLLike As System.Data.DataSet
@@ -34,21 +34,20 @@ Public Class Form1
         dataSetFiltered = New System.Data.DataSet
         dataSetErgebnisSQLLike = New System.Data.DataSet
         dataSetAfterF = New System.Data.DataSet
-        'GDLicense()
+        GDLicense()
         dataSetFiltered.Tables.Add(table)
         MyConnection = New System.Data.OleDb.OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties=Excel 12.0;")
-        ' extractObject("O:\LUVA Verwaltungs GmbH\Testdaten_Produktion\2_DTFSD_01-13-2023_53.pdf")
         datatable()
         dataSetAnpassen()
-        erstellenStadtFilter()
-        ifNothingFoundFilter(TextTest)
+        'erstellenStadtFilter()
+        'ifNothingFoundFilter(TextTest)
 
     End Sub
 
-    Private Sub extractObject(Pfad_PDF As String)
+    Private Function extractObject(Pfad_PDF As String)
         Dim TextWithCoords As String
         Dim OCRdata As New List(Of OCRDataStruct)
-        Dim writer As TextWriter = New StreamWriter("C:\Users\vincent.rieker\source\repos\Luva Extractor\TextWithCoordsText.txt")
+        Dim writer As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\text.txt")
         Using oGdPDF As New GdPicturePDF
             With oGdPDF
                 Dim status As GdPictureStatus
@@ -69,6 +68,8 @@ Public Class Form1
         ' Trenne Infos pro Line nach separator "~"
         ' Iteriere durch Infos und überführe diese in ein Objekt vom Typ OCRDataStruct
         'For Each
+        Dim c As Int32 = 0
+        Dim cont As Boolean = False
         Dim konkat As String = ""
         Dim koorXWord As Double
         Dim koorYWord As Double
@@ -82,7 +83,14 @@ Public Class Form1
             Dim zeileWort() As String = Split(word, "~")
             koorXWord = Double.Parse(zeileWort(0).Replace(".", ","))
             koorYWord = Double.Parse(zeileWort(1).Replace(".", ","))
-            If zeileWort(8).Contains("WEG") Then
+            For Each s As String In standardFilter
+                If word.Contains(s) Then
+                    cont = True
+                    c += 1
+                End If
+            Next
+            If cont = True And c = 1 Then
+                cont = False
                 Dim koordinatenPDF As New KoordinatenPDF()
 
                 xAchse = koorXWord - 1
@@ -91,30 +99,30 @@ Public Class Form1
                 koordinatenPDF.koordinatenFuellenOEcke(xAchse, yAchse)
                 koordinatenPDF.koordinatenFuellenUEcke(xAchse + 150, yAchse + 50)
                 contSKrit = True
-                'riter.WriteLine(zeileWort(8))
+                'writer.WriteLine(zeileWort(8))
 
                 'writer.Write(word)
             End If
-            'If contSKrit = True Then
-            '    count = count + 1
-            '    writer.WriteLine(word)
-            '    If count = 50 Then
-            '        contSKrit = False
-            '    End If
+            If contSKrit = True Then
+                konkat += zeileWort(8) + " "
+                count = count + 1
+                writer.WriteLine(word)
+                If count = 30 Then
+                    contSKrit = False
+                End If
 
-            'End If
+            End If
             'Hardcode
 
-            If koorXWord >= xAchse And koorXWord <= xAchse + 152 And koorYWord >= yAchse And koorYWord <= yAchse + 55 Then
+            'If koorXWord >= xAchse And koorXWord <= xAchse + 152 And koorYWord >= yAchse And koorYWord <= yAchse + 60 Then
 
-                If koorYWord > yAchseVorgaenger + 5 Then
-                    writer.WriteLine("")
-                End If
-                writer.Write(zeileWort(8) + " ")
-                yAchseVorgaenger = koorYWord
-                konkat += zeileWort(8).Replace("(", "").Replace(")", "") + " "
-            End If
-
+            '    If koorYWord > yAchseVorgaenger + 5 Then
+            '        writer.WriteLine("")
+            '    End If
+            '    writer.Write(zeileWort(8) + " ")
+            '    yAchseVorgaenger = koorYWord
+            '    konkat += zeileWort(8).Replace("(", "").Replace(")", "") + " "
+            'End If
         Next
         writer.WriteLine("")
         writer.WriteLine(konkat)
@@ -130,17 +138,18 @@ Public Class Form1
         'End With
         'OCRdata.Add(_tempOCRDataStruct)
         ' Next
-    End Sub
+        Return konkat
+    End Function
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        OpenFileDialog1.InitialDirectory = "O:\LUVA Verwaltungs GmbH\Testdaten_Produktion\"
-        OpenFileDialog1.Filter = "PDF (*.pdf)|*.pdf"
-        OpenFileDialog1.ShowDialog()
-        extractObject(OpenFileDialog1.FileName)
-    End Sub
+    'Private Sub Button1_Click(sender As Object, e As EventArgs)
+    '    OpenFileDialog1.InitialDirectory = "O:\LUVA Verwaltungs GmbH\Testdaten_Produktion\"
+    '    OpenFileDialog1.Filter = "PDF (*.pdf)|*.pdf"
+    '    OpenFileDialog1.ShowDialog()
+    '    extractObject(OpenFileDialog1.FileName)
+    'End Sub
     Private Sub excelAuslesen(ByVal path As String)
         Dim ExcelT As Microsoft.Office.Interop.Excel.Application = New Microsoft.Office.Interop.Excel.Application
-        ExcelT.Workbooks.Open("O:\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx")
+        ExcelT.Workbooks.Open("O:\LUVA Verwaltungs GmbH\Testdaten\Kopie von objektliste neu.xlsx")
 
     End Sub
     Private Sub erstellenStadtFilter()
@@ -174,8 +183,8 @@ Public Class Form1
             End If
 
         Next
-        ifNothingFoundSQL(text)
-        Return 0
+        Dim Ergebnis As String = ifNothingFoundFilter(text)
+        Return Ergebnis
     End Function
 
 
@@ -183,6 +192,7 @@ Public Class Form1
     'nur dass über die Daten aus der Pdf als auch der Daten der Tabelle ein Filter gelegt wird sodass auch ähnlichkeiten schon zu einem Treffer führen
     'wenn mehrere Treffer gefunden wurden muss der User selbst wählen welcher Eintrag der richtige ist
     Public Function ifNothingFoundFilter(Text As String)
+        Dim TextEd As String
         Dim dataTableAfterF As System.Data.DataTable
         dataTableAfterF = New System.Data.DataTable
         dataTableAfterF.Columns.Add("Nr#")
@@ -195,12 +205,12 @@ Public Class Form1
         dataTableAfterF.Columns.Add("iban")
         dataTableAfterF.Columns.Add("bic")
         dataSetAfterF.Tables.Add(dataTableAfterF)
-        Text = Regex.Replace(Text, "str\.|Str\.", "straße")
-        Text = Regex.Replace(Text, "\d", "")
+        TextEd = Regex.Replace(Text, "str\.|Str\.", "straße")
+        TextEd = Regex.Replace(Text, "\d", "")
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
             Dim hilfsstringStrasse As String = Row(1).ToString.Trim()
             Dim hilfsstringOrt As String = Row(3).ToString.Trim()
-            If Text.Contains(hilfsstringStrasse) And Text.Contains(hilfsstringOrt) Then
+            If TextEd.Contains(hilfsstringStrasse) And TextEd.Contains(hilfsstringOrt) Then
                 Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
                 For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
                     RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
@@ -252,6 +262,11 @@ Public Class Form1
             Next
             formCheck.stringTFeld = arrayValD
             formCheck.arrayRow = arrayRow
+        ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
+            Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
+            Return Row(6).ToString
+        Else
+            ifNothingFoundSQL(Text)
         End If
     End Function
     Public Function ifNothingFoundSQL(text As String)
@@ -272,14 +287,13 @@ Public Class Form1
         'Next
         splitText = text.Split(" ")
         For s As Integer = 0 To splitText.Length - 1
-            If splitText(s) <= 3 Then
+            If splitText(s).Length <= 3 Then
                 splitText(s) = ""
             End If
         Next
 
         '@todo Prüfen ob in der Datenbank etwas gefunden wurde wenn ja dann DataSet Füllen 
         For Each s As String In splitText
-
             Try
                 Dim sqlConcat As String = "Select dm From [Tabelle1$] Where Objekt LIKE '%" & s & "%' AND ort = " & Filterused
                 MyCommand = New System.Data.OleDb.OleDbDataAdapter(sqlConcat, MyConnection)
@@ -288,7 +302,52 @@ Public Class Form1
 
             End Try
             If dataSet.Tables(0).Rows.Count > 1 Then
-
+                Dim arrayValD(dataSetAfterF.Tables(0).Rows.Count - 1) As String
+                Dim arrayRow(dataSetAfterF.Tables(0).Rows.Count - 1) As DataRow
+                Dim formCheck As Form2 = New Form2
+                Dim counter As Int32 = 0
+                formCheck.AdressePDF.Text = text
+                'Für jede Reihe im gefilterten set wird die passende Reihe in der ungefilterten datenbamk gesucht per ID (Nr.)
+                'Wenn die Nummer gefunden wird wird die Reihe zu einem String konvertiert und die Straße in der Combobox hinzugefügt 
+                For Each Row As DataRow In dataSetAfterF.Tables(0).Rows
+                    Dim id As String = Row(0).ToString
+                    For Each RowO As DataRow In dataSet.Tables(0).Rows
+                        If (RowO(0).ToString.Equals(id)) Then
+                            'formCheck.AdressenCombo.Items.Add(RowO(1).ToString)
+                            Dim Conc As String = ""
+                            arrayRow(counter) = RowO
+                            For i As Int32 = 0 To dataSet.Tables(0).Columns.Count
+                                Select Case i
+                                    Case 0
+                                        Conc += "Nr." & vbTab & vbTab & RowO(0) & Environment.NewLine()
+                                    Case 1
+                                        Conc += "Straße" & vbTab & vbTab & RowO(1) & Environment.NewLine()
+                                    Case 2
+                                        Conc += "Plz" & vbTab & vbTab & RowO(2) & Environment.NewLine()
+                                    Case 3
+                                        Conc += "Ort" & vbTab & vbTab & RowO(3) & Environment.NewLine()
+                                    Case 4
+                                        Conc += "etv" & vbTab & vbTab & RowO(4) & Environment.NewLine()
+                                    Case 5
+                                        Conc += "ob" & vbTab & vbTab & RowO(5) & Environment.NewLine()
+                                    Case 6
+                                        Conc += "bh" & vbTab & vbTab & RowO(6) & Environment.NewLine()
+                                    Case 7
+                                        Conc += "iban" & vbTab & vbTab & RowO(7) & Environment.NewLine()
+                                    Case 8
+                                        Conc += "bic" & vbTab & vbTab & RowO(8) & Environment.NewLine()
+                                End Select
+                            Next
+                            arrayValD(counter) = Conc
+                            counter = counter + 1
+                        End If
+                    Next
+                Next
+                formCheck.stringTFeld = arrayValD
+                formCheck.arrayRow = arrayRow
+            ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
+                Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
+                Return Row(6).ToString
             End If
         Next
     End Function
@@ -311,7 +370,7 @@ Public Class Form1
     '   wird gesplittet und die 2 Straße in eine neue Zeile geschrieben alle anderen Daten werden übernommen
     Public Sub dataSetAnpassen()
         Dim anzahlRows As Int32 = dataSet.Tables(0).Rows.Count()
-        VorherTB.Text = anzahlRows
+
         For Each Row As DataRow In dataSet.Tables(0).Rows
             Dim valStr As String = Row(1).ToString()
             valStr = Regex.Replace(valStr, "str\.|Str\.", "straße")
@@ -370,8 +429,69 @@ Public Class Form1
             ShowTable += hilfsstring + Environment.NewLine
 
         Next
-        TextBox2.Text = ShowTable
+
+    End Sub
+    Sub zuordnungPDF(pathPDF As String, ziel As String)
+        OpenFileDialog1.FileName = pathPDF
+        Dim pdf_name As String = OpenFileDialog1.SafeFileName
+        Dim pathzielordner As String = My.Resources.StandardPath + "\"
+        pathzielordner += ziel
+        Try
+            Directory.CreateDirectory(pathzielordner)
+        Catch ex As Exception
+
+        End Try
+        pathzielordner += "\" + pdf_name
+        My.Computer.FileSystem.CopyFile(pathPDF, pathzielordner, True)
+
+    End Sub
+    Sub loadPDf()
+        FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDF
+        FolderBrowserDialog1.ShowDialog()
+        Dim konkat As String
+        Dim FolderPDF As String = FolderBrowserDialog1.SelectedPath
+        Dim allFiles As String() = Directory.GetFiles(FolderPDF)
+        Dim Ziel As String
+        For Each s As String In allFiles
+            konkat = extractObject(s)
+            If konkat.Equals("") Then
+            Else
+                Ziel = checkAdresse(konkat)
+                zuordnungPDF(s, Ziel)
+            End If
+
+
+        Next
+    End Sub
+    Public Sub addFilter(ByVal filter As String)
+        Dim laengeA As Int32 = standardFilter.Length
+        Dim Hilfsarray(laengeA + 1) As String
+        For a As Integer = 0 To laengeA - 1
+            Hilfsarray(a) = standardFilter(a)
+        Next
+        Hilfsarray(Hilfsarray.Length - 1) = filter
+        standardFilter = Hilfsarray
     End Sub
 
+    Private Sub StandardPfadFestlegenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles StandardPfadFestlegenToolStripMenuItem.Click
 
+        FolderBrowserDialog2.ShowDialog()
+        My.Settings.StandardPath = FolderBrowserDialog2.SelectedPath
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        loadPDf()
+    End Sub
+
+    Private Sub PfadZurDatenbankFestlegenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PfadZurDatenbankFestlegenToolStripMenuItem.Click
+        OpenFileDialog1.Filter = "Excel (*.xlsx)|*.xlsx"
+        OpenFileDialog1.ShowDialog()
+        My.Settings.DatenbankPath = OpenFileDialog1.FileName
+    End Sub
+
+    Private Sub BasisPfadZumPDFOrdnerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BasisPfadZumPDFOrdnerToolStripMenuItem.Click
+        Dim folderbrowserDialogBPDF As New FolderBrowserDialog
+        folderbrowserDialogBPDF.ShowDialog()
+        My.Settings.basicPathPDf = folderbrowserDialogBPDF.SelectedPath
+    End Sub
 End Class
