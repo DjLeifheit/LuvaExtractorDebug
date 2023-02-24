@@ -480,17 +480,22 @@ Public Class Form1
     Sub loadPDf()
         FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         FolderBrowserDialog1.ShowDialog()
+        Dim writerCSV As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\AlleDaten.csv")
         Dim konkat As String
         Dim FolderPDF As String = FolderBrowserDialog1.SelectedPath
         Dim allFiles As String() = Directory.GetFiles(FolderPDF)
         Dim Ziel As String
         For Each s As String In allFiles
+
             konkat = extractObject(s)
+            writerCSV.Write(s + ";" + konkat + ";")
             If konkat.Equals("") Then
                 Ziel = ""
                 zuordnungPDF(s, Ziel)
+
             Else
                 Ziel = checkAdresse(konkat)
+                writerCSV.Write(Ziel)
                 If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
                     zuordnungPDF(s, Ziel)
                 Else
@@ -498,9 +503,10 @@ Public Class Form1
                     zuordnungPDF(s, Ziel)
                 End If
             End If
-
+            writerCSV.WriteLine()
 
         Next
+        writerCSV.Close()
     End Sub
     Public Sub addFilter(ByVal filter As String)
         Dim laengeA As Int32 = standardFilter.Length
