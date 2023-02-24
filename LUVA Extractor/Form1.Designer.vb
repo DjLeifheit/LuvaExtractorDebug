@@ -34,9 +34,9 @@ Partial Class Form1
         Me.SetupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StandardPfadFestlegenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PfadZurDatenbankFestlegenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BasisPfadZumPDFOrdnerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.FolderBrowserDialog2 = New System.Windows.Forms.FolderBrowserDialog()
-        Me.BasisPfadZumPDFOrdnerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -46,7 +46,7 @@ Partial Class Form1
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(349, 190)
+        Me.Button1.Location = New System.Drawing.Point(372, 109)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(131, 56)
         Me.Button1.TabIndex = 0
@@ -96,20 +96,20 @@ Partial Class Form1
         Me.PfadZurDatenbankFestlegenToolStripMenuItem.Size = New System.Drawing.Size(230, 22)
         Me.PfadZurDatenbankFestlegenToolStripMenuItem.Text = "Pfad zur Datenbank Festlegen"
         '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(199, 212)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(134, 13)
-        Me.Label1.TabIndex = 3
-        Me.Label1.Text = "Bitte PDF Ordner eingeben"
-        '
         'BasisPfadZumPDFOrdnerToolStripMenuItem
         '
         Me.BasisPfadZumPDFOrdnerToolStripMenuItem.Name = "BasisPfadZumPDFOrdnerToolStripMenuItem"
         Me.BasisPfadZumPDFOrdnerToolStripMenuItem.Size = New System.Drawing.Size(230, 22)
         Me.BasisPfadZumPDFOrdnerToolStripMenuItem.Text = "Basis Pfad zum PDF Ordner"
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(218, 131)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(134, 13)
+        Me.Label1.TabIndex = 3
+        Me.Label1.Text = "Bitte PDF Ordner eingeben"
         '
         'Form1
         '

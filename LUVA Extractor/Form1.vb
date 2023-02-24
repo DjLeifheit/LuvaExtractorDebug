@@ -6,7 +6,7 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
-    Dim standardFilter As String() = {"WEG", "Objekt"}
+    Dim standardFilter As String() = {"WEG", "Objekt", "Firma"}
     Dim zielordner As String = ""
     Dim stadtFilterHSet As HashSet(Of String) = New HashSet(Of String)
     Dim dataSetFiltered As System.Data.DataSet
@@ -187,6 +187,8 @@ Public Class Form1
     Public Function checkAdresse(text As String)
         text = Regex.Replace(text, "str\.", "straße ")
         text = Regex.Replace(text, "Str\.", "Straße ")
+        text = Regex.Replace(text, "strasse", "straße")
+        text = Regex.Replace(text, "Strasse", "Straße")
         text = Regex.Replace(text, "-v-", "-von-")
         text = Regex.Replace(text, "\s\s\s\s\s|\s\s\s\s|\s\s\s|\s\s", " ")
         text = Regex.Replace(text, "d\.", "der")
@@ -196,11 +198,13 @@ Public Class Form1
             'valStr = Split(valStr, " ")(0)
             Dim valOrt As String = Row(3).ToString()
 
-
+            I
             If text.Contains(valStr) Then
                 ' If text.Contains(valOrt) Then
                 Return Row(5).ToString
             End If
+
+
 
 
 
@@ -239,17 +243,20 @@ Public Class Form1
         TextEd = Regex.Replace(Text, "str\.|Str\.", "straße")
         TextEd = Regex.Replace(Text, "\d", "")
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
-            Dim hilfsstringStrasse As String = Row(1).ToString.Trim()
-            Dim hilfsstringOrt As String = Row(3).ToString.Trim()
-            If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
+            If Row(0).Equals("133") Or Row(0).Equals("127") Then
+                Dim hilfsstringStrasse As String = Row(1).ToString.Trim()
+                Dim hilfsstringOrt As String = Row(3).ToString.Trim()
+                If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
 
-            ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
-                Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
+                ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
+                    Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
                     For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
                         RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
                     Next
-                dataSetAfterF.Tables(0).Rows.Add(RowNew)
+                    dataSetAfterF.Tables(0).Rows.Add(RowNew)
+                End If
             End If
+
 
         Next
         If dataSetAfterF.Tables(0).Rows.Count > 1 Then
@@ -535,13 +542,13 @@ Public Class Form1
                 End If
             End If
             writerCSV.WriteLine()
-
         Next
         writerCSV.Close()
     End Sub
+
     Public Sub addFilter(ByVal filter As String)
         Dim laengeA As Int32 = standardFilter.Length
-        Dim Hilfsarray(laengeA + 1) As String
+        Dim Hilfsarray(laengeA) As String
         For a As Integer = 0 To laengeA - 1
             Hilfsarray(a) = standardFilter(a)
         Next
@@ -569,5 +576,15 @@ Public Class Form1
         Dim folderbrowserDialogBPDF As New FolderBrowserDialog
         folderbrowserDialogBPDF.ShowDialog()
         My.Settings.basicPathPDf = folderbrowserDialogBPDF.SelectedPath
+    End Sub
+
+    Private Sub FilterHinzufügenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FilterHinzufügenToolStripMenuItem.Click
+        Dim formFilter As New Form3
+        formFilter.ShowDialog()
+        addFilter(formFilter.getFilter)
+    End Sub
+
+    Private Sub MenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStrip1.ItemClicked
+
     End Sub
 End Class
