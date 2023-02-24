@@ -41,6 +41,7 @@ Public Class Form1
         dataSetFiltered.Tables.Add(table)
         MyConnection = New System.Data.OleDb.OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties=Excel 12.0;")
         datatable()
+        'extractObject("O:\LUVA Verwaltungs GmbH\Testdaten\217 2021-09-21 avr abfallgebührenbescheid.pdf")
         'dataSetAnpassen()
         'erstellenStadtFilter()
         'ifNothingFoundFilter(TextTest)
@@ -84,28 +85,33 @@ Public Class Form1
         Dim count As Int32 = 0
         For Each word In words
             Dim zeileWort() As String = Split(word, "~")
-            koorXWord = Double.Parse(zeileWort(0).Replace(".", ","))
-            koorYWord = Double.Parse(zeileWort(1).Replace(".", ","))
+            'koorXWord = Double.Parse(zeileWort(0).Replace(".", ","))
+            'koorYWord = Double.Parse(zeileWort(1).Replace(".", ","))
             For Each s As String In standardFilter
-                If word.Contains(s) Then
-                    cont = True
-                    c += 1
-                End If
+                Try
+                    If zeileWort(8).Equals("WEG") Then
+                        contSKrit = True
+
+                        'c += 1
+                    End If
+                Catch
+
+                End Try
             Next
-            If cont = True And c = 1 Then
-                cont = False
-                Dim koordinatenPDF As New KoordinatenPDF()
+            'If cont = True And c = 1 Then
+            '    cont = False
+            '    Dim koordinatenPDF As New KoordinatenPDF()
 
-                xAchse = koorXWord - 1
-                yAchse = koorYWord - 3
-                yAchseVorgaenger = yAchse - 1
-                koordinatenPDF.koordinatenFuellenOEcke(xAchse, yAchse)
-                koordinatenPDF.koordinatenFuellenUEcke(xAchse + 150, yAchse + 50)
-                contSKrit = True
-                'writer.WriteLine(zeileWort(8))
+            '    'xAchse = koorXWord - 1
+            '    'yAchse = koorYWord - 3
+            '    'yAchseVorgaenger = yAchse - 1
+            '    'koordinatenPDF.koordinatenFuellenOEcke(xAchse, yAchse)
+            '    'koordinatenPDF.koordinatenFuellenUEcke(xAchse + 150, yAchse + 50)
+            '    contSKrit = True
+            '    'writer.WriteLine(zeileWort(8))
 
-                'writer.Write(word)
-            End If
+            '    'writer.Write(word)
+            'End If
             If contSKrit = True Then
                 konkat += zeileWort(8) + " "
                 count = count + 1
@@ -178,12 +184,26 @@ Public Class Form1
     'Funktion: Reverse Check prüft ob in der Adresse der Pdf straße und und Ort die in der Datenbank hinterlegt sind in dieser Konstelation vorhanden sind
     'wenn das nicht der Fall ist wird die gefilterte Variante geprüft 
     Public Function checkAdresse(text As String)
+        text = Regex.Replace(text, "str\.", "straße ")
+        text = Regex.Replace(text, "Str\.", "Straße ")
+        text = Regex.Replace(text, "\s\s\s\s\s|\s\s\s\s|\s\s\s|\s\s", " ")
+        text = Regex.Replace(text, "d\.", "der")
         For Each Row As DataRow In dataSet.Tables(0).Rows
             Dim valStr As String = Row(1).ToString()
+
+            'valStr = Split(valStr, " ")(0)
             Dim valOrt As String = Row(3).ToString()
-            If text.Contains(valStr) And text.Contains(valOrt) Then
-                Return Row(6).ToString
-            End If
+
+            If text.Contains(valStr) Then
+                    ' If text.Contains(valOrt) Then
+                    Return Row(6).ToString
+                End If
+
+            ' End If
+
+
+
+
 
         Next
         Dim Ergebnis As String = ifNothingFoundFilter(text)
@@ -443,6 +463,9 @@ Public Class Form1
     End Sub
     Sub zuordnungPDF(pathPDF As String, ziel As String)
         OpenFileDialog1.FileName = pathPDF
+        If ziel.Equals("") Or String.IsNullOrEmpty(ziel) Then
+            ziel = "konnte nicht zugeordnet werden"
+        End If
         Dim pdf_name As String = OpenFileDialog1.SafeFileName
         Dim pathzielordner As String = My.Resources.StandardPath + "\" + ziel
         Try
@@ -464,9 +487,14 @@ Public Class Form1
         For Each s As String In allFiles
             konkat = extractObject(s)
             If konkat.Equals("") Then
+                Ziel = ""
+                zuordnungPDF(s, Ziel)
             Else
                 Ziel = checkAdresse(konkat)
                 If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
+                    zuordnungPDF(s, Ziel)
+                Else
+                    Ziel = ""
                     zuordnungPDF(s, Ziel)
                 End If
             End If
