@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("O:\LUVA Verwaltungs GmbH\Testdaten\Ziele")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("O:\LUVA Verwaltungs GmbH\Präsentation\Output")>  _
         Public Property StandardPath() As String
             Get
                 Return CType(Me("StandardPath"),String)

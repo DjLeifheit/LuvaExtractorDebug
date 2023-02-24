@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="StandardPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH\Testdaten\Ziele</Value>
+      <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH\Präsentation\Output</Value>
     </Setting>
     <Setting Name="DatenbankPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx</Value>

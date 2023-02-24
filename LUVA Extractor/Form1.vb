@@ -498,7 +498,7 @@ Public Class Form1
             ziel = "konnte nicht zugeordnet werden"
         End If
         Dim pdf_name As String = OpenFileDialog1.SafeFileName
-        Dim pathzielordner As String = My.Resources.StandardPath + "\" + ziel
+        Dim pathzielordner As String = "O:\LUVA Verwaltungs GmbH\Präsentation\Output\" + ziel
         Try
             Directory.CreateDirectory(pathzielordner)
         Catch ex As Exception
