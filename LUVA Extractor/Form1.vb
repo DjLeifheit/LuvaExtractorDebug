@@ -6,7 +6,7 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
-    Dim standardFilter As String() = {"WEG"}
+    Dim standardFilter As String() = {"WEG", "Objekt"}
     Dim zielordner As String = ""
     Dim stadtFilterHSet As HashSet(Of String) = New HashSet(Of String)
     Dim dataSetFiltered As System.Data.DataSet
@@ -41,8 +41,9 @@ Public Class Form1
         dataSetFiltered.Tables.Add(table)
         MyConnection = New System.Data.OleDb.OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties=Excel 12.0;")
         datatable()
-        'extractObject("O:\LUVA Verwaltungs GmbH\Testdaten\217 2021-09-21 avr abfallgebührenbescheid.pdf")
-        'dataSetAnpassen()
+        dataSetAnpassen()
+        ' extractObject("O:\LUVA Verwaltungs GmbH\Testdaten_Produktion\10_DTFSD_01-13-2023_61.pdf")
+
         'erstellenStadtFilter()
         'ifNothingFoundFilter(TextTest)
 
@@ -72,7 +73,7 @@ Public Class Form1
         ' Trenne Infos pro Line nach separator "~"
         ' Iteriere durch Infos und überführe diese in ein Objekt vom Typ OCRDataStruct
         'For Each
-        Dim c As Int32 = 0
+        Dim count As Int32 = 0
         Dim cont As Boolean = False
         Dim konkat As String = ""
         Dim koorXWord As Double
@@ -82,16 +83,16 @@ Public Class Form1
         Dim yAchse As Double = 0
         Dim words() As String = TextWithCoords.Split(Environment.NewLine) 'vbcrlf
         Dim contSKrit As Boolean = False
-        Dim count As Int32 = 0
+        Dim counterFilter As Int32 = 0
         For Each word In words
             Dim zeileWort() As String = Split(word, "~")
             'koorXWord = Double.Parse(zeileWort(0).Replace(".", ","))
             'koorYWord = Double.Parse(zeileWort(1).Replace(".", ","))
             For Each s As String In standardFilter
                 Try
-                    If zeileWort(8).Equals("WEG") Then
+                    If zeileWort(8).Equals(s) And counterFilter = 0 Then
                         contSKrit = True
-
+                        counterFilter = counterFilter + 1
                         'c += 1
                     End If
                 Catch
@@ -116,7 +117,7 @@ Public Class Form1
                 konkat += zeileWort(8) + " "
                 count = count + 1
                 writer.WriteLine(word)
-                If count = 30 Then
+                If count = 20 Then
                     contSKrit = False
                 End If
 
@@ -186,6 +187,7 @@ Public Class Form1
     Public Function checkAdresse(text As String)
         text = Regex.Replace(text, "str\.", "straße ")
         text = Regex.Replace(text, "Str\.", "Straße ")
+        text = Regex.Replace(text, "-v-", "-von-")
         text = Regex.Replace(text, "\s\s\s\s\s|\s\s\s\s|\s\s\s|\s\s", " ")
         text = Regex.Replace(text, "d\.", "der")
         For Each Row As DataRow In dataSet.Tables(0).Rows
@@ -194,10 +196,13 @@ Public Class Form1
             'valStr = Split(valStr, " ")(0)
             Dim valOrt As String = Row(3).ToString()
 
+
             If text.Contains(valStr) Then
-                    ' If text.Contains(valOrt) Then
-                    Return Row(6).ToString
-                End If
+                ' If text.Contains(valOrt) Then
+                Return Row(5).ToString
+            End If
+
+
 
             ' End If
 
@@ -236,63 +241,79 @@ Public Class Form1
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
             Dim hilfsstringStrasse As String = Row(1).ToString.Trim()
             Dim hilfsstringOrt As String = Row(3).ToString.Trim()
-            If TextEd.Contains(hilfsstringStrasse) And TextEd.Contains(hilfsstringOrt) Then
+            If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
+
+            ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
                 Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
-                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
-                    RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
-                Next
+                    For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                        RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
+                    Next
                 dataSetAfterF.Tables(0).Rows.Add(RowNew)
             End If
+
         Next
         If dataSetAfterF.Tables(0).Rows.Count > 1 Then
-            Dim arrayValD(dataSetAfterF.Tables(0).Rows.Count - 1) As String
-            Dim arrayRow(dataSetAfterF.Tables(0).Rows.Count - 1) As DataRow
-            Dim formCheck As Form2 = New Form2
-            Dim counter As Int32 = 0
-            formCheck.AdressePDF.Text = Text
-            'Für jede Reihe im gefilterten set wird die passende Reihe in der ungefilterten datenbamk gesucht per ID (Nr.)
-            'Wenn die Nummer gefunden wird wird die Reihe zu einem String konvertiert und die Straße in der Combobox hinzugefügt 
-            For Each Row As DataRow In dataSetAfterF.Tables(0).Rows
-                Dim id As String = Row(0).ToString
-                For Each RowO As DataRow In dataSet.Tables(0).Rows
-                    If (RowO(0).ToString.Equals(id)) Then
-                        'formCheck.AdressenCombo.Items.Add(RowO(1).ToString)
-                        Dim Conc As String = ""
-                        arrayRow(counter) = RowO
-                        For i As Int32 = 0 To dataSet.Tables(0).Columns.Count
-                            Select Case i
-                                Case 0
-                                    Conc += "Nr." & vbTab & vbTab & RowO(0) & Environment.NewLine()
-                                Case 1
-                                    Conc += "Straße" & vbTab & vbTab & RowO(1) & Environment.NewLine()
-                                Case 2
-                                    Conc += "Plz" & vbTab & vbTab & RowO(2) & Environment.NewLine()
-                                Case 3
-                                    Conc += "Ort" & vbTab & vbTab & RowO(3) & Environment.NewLine()
-                                Case 4
-                                    Conc += "etv" & vbTab & vbTab & RowO(4) & Environment.NewLine()
-                                Case 5
-                                    Conc += "ob" & vbTab & vbTab & RowO(5) & Environment.NewLine()
-                                Case 6
-                                    Conc += "bh" & vbTab & vbTab & RowO(6) & Environment.NewLine()
-                                Case 7
-                                    Conc += "iban" & vbTab & vbTab & RowO(7) & Environment.NewLine()
-                                Case 8
-                                    Conc += "bic" & vbTab & vbTab & RowO(8) & Environment.NewLine()
-                            End Select
-                        Next
-                        arrayValD(counter) = Conc
-                        counter = counter + 1
-                    End If
-                Next
+            Dim checkHash As HashSet(Of String) = New HashSet(Of String)
+            For Each RowCheck As DataRow In dataSetAfterF.Tables(0).Rows
+                checkHash.Add(RowCheck(5).ToString)
+
             Next
-            formCheck.stringTFeld = arrayValD
-            formCheck.arrayRow = arrayRow
-        ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
-            Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
-            Return Row(6).ToString
+            If checkHash.Count = 1 Then
+                Return checkHash(0).ToString
+            End If
+
+            Dim arrayValD(dataSetAfterF.Tables(0).Rows.Count - 1) As String
+                Dim arrayRow(dataSetAfterF.Tables(0).Rows.Count - 1) As DataRow
+
+                Dim counter As Int32 = 0
+
+                'Für jede Reihe im gefilterten set wird die passende Reihe in der ungefilterten datenbamk gesucht per ID (Nr.)
+                'Wenn die Nummer gefunden wird wird die Reihe zu einem String konvertiert und die Straße in der Combobox hinzugefügt 
+                For Each Row As DataRow In dataSetAfterF.Tables(0).Rows
+                    Dim id As String = Row(0).ToString
+                    For Each RowO As DataRow In dataSet.Tables(0).Rows
+                        If (RowO(0).ToString.Equals(id)) Then
+                            'formCheck.AdressenCombo.Items.Add(RowO(1).ToString)
+                            Dim Conc As String = ""
+                            arrayRow(counter) = RowO
+                            For i As Int32 = 0 To dataSet.Tables(0).Columns.Count
+                                Select Case i
+                                    Case 0
+                                        Conc += "Nr." & vbTab & vbTab & RowO(0) & Environment.NewLine()
+                                    Case 1
+                                        Conc += "Straße" & vbTab & vbTab & RowO(1) & Environment.NewLine()
+                                    Case 2
+                                        Conc += "Plz" & vbTab & vbTab & RowO(2) & Environment.NewLine()
+                                    Case 3
+                                        Conc += "Ort" & vbTab & vbTab & RowO(3) & Environment.NewLine()
+                                    Case 4
+                                        Conc += "etv" & vbTab & vbTab & RowO(4) & Environment.NewLine()
+                                    Case 5
+                                        Conc += "ob" & vbTab & vbTab & RowO(5) & Environment.NewLine()
+                                    Case 6
+                                        Conc += "bh" & vbTab & vbTab & RowO(6) & Environment.NewLine()
+                                    Case 7
+                                        Conc += "iban" & vbTab & vbTab & RowO(7) & Environment.NewLine()
+                                    Case 8
+                                        Conc += "bic" & vbTab & vbTab & RowO(8) & Environment.NewLine()
+                                End Select
+                            Next
+                            arrayValD(counter) = Conc
+                            counter = counter + 1
+                            Exit For
+                        End If
+                    Next
+                Next
+                'Dim formCheck As Form2 = New Form2
+                'formCheck.AdressePDF.Text = Text
+                'formCheck.stringTFeld = arrayValD
+                'formCheck.arrayRow = arrayRow
+                'formCheck.ShowDialog()
+            ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
+                Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
+            Return Row(5).ToString
         Else
-            ifNothingFoundSQL(Text)
+                ifNothingFoundSQL(Text)
         End If
     End Function
     Public Function ifNothingFoundSQL(text As String)
@@ -374,7 +395,7 @@ Public Class Form1
                     formCheck.arrayRow = arrayRow
                 ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
                     Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
-                    Return Row(6).ToString
+                    Return Row(5).ToString
                 End If
             End If
         Next
@@ -401,14 +422,19 @@ Public Class Form1
 
         For Each Row As DataRow In dataSet.Tables(0).Rows
             Dim valStr As String = Row(1).ToString()
+            valStr = Regex.Replace(valStr, "\s\s", " ")
             valStr = Regex.Replace(valStr, "str\.|Str\.", "straße")
             valStr = Regex.Replace(valStr, "[0-9][A-z]\-|[0-9]\s[A-z]\-", "00")
             valStr = Regex.Replace(valStr, "\,\s[0-9]|\+", "00")
             valStr = Regex.Replace(valStr, "\-[0-9]", "00")
             valStr = Regex.Replace(valStr, "\/[0-9]", "00")
-            valStr = Regex.Replace(valStr, "\d", "  ")
-            valStr = Regex.Replace(valStr, "\s[a-z]\s", " ")
-            valStr = valStr.Split("  ")(0)
+            valStr = Regex.Replace(valStr, "\d", "   ")
+            valStr = Regex.Replace(valStr, "\s[a-z]\s", "  ")
+            valStr.TrimEnd()
+            valStr = Regex.Replace(valStr, "\s\s[a-z]", "")
+            valStr = Regex.Replace(valStr, "\s\s[a-z]", "")
+            valStr = Regex.Replace(valStr, "\s\s[a-z]", "")
+
 
 
             If valStr.Contains("/") Then
@@ -418,11 +444,12 @@ Public Class Form1
                     RowAdd(Coll.ColumnName) = Row(Coll.ColumnName)
                 Next
                 RowAdd(1) = strasseSplit(1)
-                Row(1) = strasseSplit(0)
+
                 Dim Rowst As DataRow = dataSetFiltered.Tables(0).NewRow()
                 For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
                     Rowst(Coll.ColumnName) = Row(Coll.ColumnName)
                 Next
+                Rowst(1) = strasseSplit(0)
                 dataSetFiltered.Tables(0).Rows.Add(Rowst)
                 dataSetFiltered.Tables(0).Rows.Add(RowAdd)
             ElseIf (valStr.Contains(",")) Then
@@ -432,18 +459,22 @@ Public Class Form1
                     RowAdd(Coll.ColumnName) = Row(Coll.ColumnName)
                 Next
                 RowAdd(1) = strasseSplit(1)
-                Row(1) = strasseSplit(0)
+
                 Dim Rowst As DataRow = dataSetFiltered.Tables(0).NewRow()
                 For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
                     Rowst(Coll.ColumnName) = Row(Coll.ColumnName)
                 Next
+                Rowst(1) = strasseSplit(0)
                 dataSetFiltered.Tables(0).Rows.Add(Rowst)
                 dataSetFiltered.Tables(0).Rows.Add(RowAdd)
-            Else Row(1) = valStr
+            Else
+                valStr = Regex.Replace(valStr, "\s\s", ";")
+                valStr = valStr.Split(";")(0)
                 Dim Rowst As DataRow = dataSetFiltered.Tables(0).NewRow()
                 For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
                     Rowst(Coll.ColumnName) = Row(Coll.ColumnName)
                 Next
+                Rowst(1) = valStr
                 dataSetFiltered.Tables(0).Rows.Add(Rowst)
             End If
 
@@ -480,7 +511,7 @@ Public Class Form1
     Sub loadPDf()
         FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         FolderBrowserDialog1.ShowDialog()
-        Dim writerCSV As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\AlleDaten.csv")
+        Dim writerCSV As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\Auswertung.csv")
         Dim konkat As String
         Dim FolderPDF As String = FolderBrowserDialog1.SelectedPath
         Dim allFiles As String() = Directory.GetFiles(FolderPDF)

@@ -16,6 +16,6 @@ Public Class Form2
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Dim name As String = arrayRow(AdressenCombo.SelectedIndex - 1)(6).ToString
+        Dim name As String = arrayRow(AdressenCombo.SelectedIndex - 1)(5).ToString
     End Sub
 End Class
