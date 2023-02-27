@@ -279,15 +279,15 @@ Public Class Form1
 
             Dim hilfsstringStrasse As String = Row(1).ToString.Trim().ToLower
             Dim hilfsstringOrt As String = Row(3).ToString.Trim()
-                If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
+            If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
 
-                ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
-                    Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
-                    For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
-                        RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
-                    Next
-                    dataSetAfterF.Tables(0).Rows.Add(RowNew)
-                End If
+            ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
+                Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
+                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                    RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
+                Next
+                dataSetAfterF.Tables(0).Rows.Add(RowNew)
+            End If
 
 
 
@@ -304,47 +304,47 @@ Public Class Form1
             End If
 
             Dim arrayValD(dataSetAfterF.Tables(0).Rows.Count - 1) As String
-                Dim arrayRow(dataSetAfterF.Tables(0).Rows.Count - 1) As DataRow
+            Dim arrayRow(dataSetAfterF.Tables(0).Rows.Count - 1) As DataRow
 
-                Dim counter As Int32 = 0
+            Dim counter As Int32 = 0
 
-                'Für jede Reihe im gefilterten set wird die passende Reihe in der ungefilterten datenbamk gesucht per ID (Nr.)
-                'Wenn die Nummer gefunden wird wird die Reihe zu einem String konvertiert und die Straße in der Combobox hinzugefügt 
-                For Each Row As DataRow In dataSetAfterF.Tables(0).Rows
-                    Dim id As String = Row(0).ToString
-                    For Each RowO As DataRow In dataSet.Tables(0).Rows
-                        If (RowO(0).ToString.Equals(id)) Then
-                            'formCheck.AdressenCombo.Items.Add(RowO(1).ToString)
-                            Dim Conc As String = ""
-                            arrayRow(counter) = RowO
-                            For i As Int32 = 0 To dataSet.Tables(0).Columns.Count
-                                Select Case i
-                                    Case 0
-                                        Conc += "Nr." & vbTab & vbTab & RowO(0) & Environment.NewLine()
-                                    Case 1
-                                        Conc += "Straße" & vbTab & vbTab & RowO(1) & Environment.NewLine()
-                                    Case 2
-                                        Conc += "Plz" & vbTab & vbTab & RowO(2) & Environment.NewLine()
-                                    Case 3
-                                        Conc += "Ort" & vbTab & vbTab & RowO(3) & Environment.NewLine()
-                                    Case 4
-                                        Conc += "etv" & vbTab & vbTab & RowO(4) & Environment.NewLine()
-                                    Case 5
-                                        Conc += "ob" & vbTab & vbTab & RowO(5) & Environment.NewLine()
-                                    Case 6
-                                        Conc += "bh" & vbTab & vbTab & RowO(6) & Environment.NewLine()
-                                    Case 7
-                                        Conc += "iban" & vbTab & vbTab & RowO(7) & Environment.NewLine()
-                                    Case 8
-                                        Conc += "bic" & vbTab & vbTab & RowO(8) & Environment.NewLine()
-                                End Select
-                            Next
-                            arrayValD(counter) = Conc
-                            counter = counter + 1
-                            Exit For
-                        End If
-                    Next
+            'Für jede Reihe im gefilterten set wird die passende Reihe in der ungefilterten datenbamk gesucht per ID (Nr.)
+            'Wenn die Nummer gefunden wird wird die Reihe zu einem String konvertiert und die Straße in der Combobox hinzugefügt 
+            For Each Row As DataRow In dataSetAfterF.Tables(0).Rows
+                Dim id As String = Row(0).ToString
+                For Each RowO As DataRow In dataSet.Tables(0).Rows
+                    If (RowO(0).ToString.Equals(id)) Then
+                        'formCheck.AdressenCombo.Items.Add(RowO(1).ToString)
+                        Dim Conc As String = ""
+                        arrayRow(counter) = RowO
+                        For i As Int32 = 0 To dataSet.Tables(0).Columns.Count
+                            Select Case i
+                                Case 0
+                                    Conc += "Nr." & vbTab & vbTab & RowO(0) & Environment.NewLine()
+                                Case 1
+                                    Conc += "Straße" & vbTab & vbTab & RowO(1) & Environment.NewLine()
+                                Case 2
+                                    Conc += "Plz" & vbTab & vbTab & RowO(2) & Environment.NewLine()
+                                Case 3
+                                    Conc += "Ort" & vbTab & vbTab & RowO(3) & Environment.NewLine()
+                                Case 4
+                                    Conc += "etv" & vbTab & vbTab & RowO(4) & Environment.NewLine()
+                                Case 5
+                                    Conc += "ob" & vbTab & vbTab & RowO(5) & Environment.NewLine()
+                                Case 6
+                                    Conc += "bh" & vbTab & vbTab & RowO(6) & Environment.NewLine()
+                                Case 7
+                                    Conc += "iban" & vbTab & vbTab & RowO(7) & Environment.NewLine()
+                                Case 8
+                                    Conc += "bic" & vbTab & vbTab & RowO(8) & Environment.NewLine()
+                            End Select
+                        Next
+                        arrayValD(counter) = Conc
+                        counter = counter + 1
+                        Exit For
+                    End If
                 Next
+            Next
             'Dim formCheck As Form2 = New Form2
             'formCheck.AdressePDF.Text = Text
             'formCheck.stringTFeld = arrayValD
@@ -355,7 +355,7 @@ Public Class Form1
             Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
             Return Row(5).ToString
         Else
-                ifNothingFoundSQL(Text)
+            ifNothingFoundSQL(Text)
         End If
     End Function
     Public Function ifNothingFoundSQL(text As String)
