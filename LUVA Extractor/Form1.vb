@@ -6,10 +6,11 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
-    Dim standardFilter As String() = {"WEG", "Objekt", "Firma"}
+    Dim standardFilter As String() = {"WEG", "Objekt", "Firma", "WEG:", "GWE"}
     Dim zielordner As String = ""
     Dim stadtFilterHSet As HashSet(Of String) = New HashSet(Of String)
     Dim dataSetFiltered As System.Data.DataSet
+    Dim FolderPDF As String = ""
     Dim MyConnection As System.Data.OleDb.OleDbConnection
     Dim MyCommand As System.Data.OleDb.OleDbDataAdapter
     Dim path As String = "O:\LUVA Verwaltungs GmbH\Testdaten\Kopie von objektliste neu.xlsx"
@@ -52,7 +53,7 @@ Public Class Form1
     Private Function extractObject(Pfad_PDF As String)
         Dim TextWithCoords As String
         Dim OCRdata As New List(Of OCRDataStruct)
-        Dim writer As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\text.txt")
+        'Dim writer As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\text.txt")
         Using oGdPDF As New GdPicturePDF
             With oGdPDF
                 Dim status As GdPictureStatus
@@ -73,6 +74,9 @@ Public Class Form1
         ' Trenne Infos pro Line nach separator "~"
         ' Iteriere durch Infos und überführe diese in ein Objekt vom Typ OCRDataStruct
         'For Each
+        Dim countShort As Int32 = 0
+        Dim textShort As String = ""
+        Dim boolShort As Boolean = False
         Dim count As Int32 = 0
         Dim cont As Boolean = False
         Dim konkat As String = ""
@@ -88,8 +92,13 @@ Public Class Form1
             Dim zeileWort() As String = Split(word, "~")
             'koorXWord = Double.Parse(zeileWort(0).Replace(".", ","))
             'koorYWord = Double.Parse(zeileWort(1).Replace(".", ","))
+            If zeileWort(8).Equals("WEG") Or zeileWort(8).Equals("WEG:") Then
+                boolShort = True
+            End If
             For Each s As String In standardFilter
                 Try
+
+
                     If zeileWort(8).Equals(s) And counterFilter = 0 Then
                         contSKrit = True
                         counterFilter = counterFilter + 1
@@ -113,10 +122,15 @@ Public Class Form1
 
             '    'writer.Write(word)
             'End If
+            If boolShort = True And countShort < 9 Then
+
+                textShort += zeileWort(8) + " "
+                countShort = countShort + 1
+            End If
             If contSKrit = True Then
                 konkat += zeileWort(8) + " "
                 count = count + 1
-                writer.WriteLine(word)
+                'writer.WriteLine(word)
                 If count = 20 Then
                     contSKrit = False
                 End If
@@ -134,11 +148,14 @@ Public Class Form1
             '    konkat += zeileWort(8).Replace("(", "").Replace(")", "") + " "
             'End If
         Next
-        writer.WriteLine("")
-        writer.WriteLine(konkat)
-        Dim Ergebnis As String = checkAdresse(konkat)
-        writer.WriteLine(Ergebnis)
-        writer.Close()
+        Dim both(1) As String
+        both(0) = konkat
+        both(1) = textShort
+        'writer.WriteLine("")
+        'writer.WriteLine(konkat)
+        'Dim Ergebnis As String = checkAdresse(konkat, textShort)
+        'writer.WriteLine(Ergebnis)
+        'writer.Close()
 
         'Dim _tempOCRDataStruct As OCRDataStruct
         'With _tempOCRDataStruct
@@ -148,7 +165,7 @@ Public Class Form1
         'End With
         'OCRdata.Add(_tempOCRDataStruct)
         ' Next
-        Return konkat
+        Return both
     End Function
 
     'Private Sub Button1_Click(sender As Object, e As EventArgs)
@@ -184,7 +201,25 @@ Public Class Form1
     'Checkt ob die Adresse (Straße und Wohnort) in dieser Kombination in der Datenbank vorhanden ist
     'Funktion: Reverse Check prüft ob in der Adresse der Pdf straße und und Ort die in der Datenbank hinterlegt sind in dieser Konstelation vorhanden sind
     'wenn das nicht der Fall ist wird die gefilterte Variante geprüft 
-    Public Function checkAdresse(text As String)
+    Public Function checkAdresse(text As String, textShort As String)
+        Dim textShortVar2 As String = ""
+        Dim textShortVar3 As String = ""
+        textShort = textShort.ToLower
+        text = text.ToLower
+        textShort = Regex.Replace(textShort, "hirschhomer", "hirschhorner")
+        textShort = Regex.Replace(textShort, "\su\.\s", "+")
+        textShort = Regex.Replace(textShort, "\s\+", "+")
+        textShort = Regex.Replace(textShort, "str\.\s|str\s", "straße ")
+        textShort = Regex.Replace(textShort, "Str\.\s| Str\s", "Straße ")
+        textShort = Regex.Replace(textShort, "strasse", "straße")
+        textShort = Regex.Replace(textShort, "Strasse", "Straße")
+        textShort = Regex.Replace(textShort, "-v-", "-von-")
+        textShort = Regex.Replace(textShort, "\s\s\s\s\s|\s\s\s\s|\s\s\s|\s\s", " ")
+        textShort = Regex.Replace(textShort, "d\.", "der")
+        textShortVar2 = Regex.Replace(textShort, "straße", " Straße")
+        textShortVar3 = Regex.Replace(textShort, "\sStraße", " straße")
+        text = Regex.Replace(text, "\su\.\s", "+")
+        text = Regex.Replace(text, "Hirschhomer", "Hirschhorner")
         text = Regex.Replace(text, "str\.", "straße ")
         text = Regex.Replace(text, "Str\.", "Straße ")
         text = Regex.Replace(text, "strasse", "straße")
@@ -193,28 +228,26 @@ Public Class Form1
         text = Regex.Replace(text, "\s\s\s\s\s|\s\s\s\s|\s\s\s|\s\s", " ")
         text = Regex.Replace(text, "d\.", "der")
         For Each Row As DataRow In dataSet.Tables(0).Rows
-            Dim valStr As String = Row(1).ToString()
-
+            Dim valStr As String = Row(1).ToString().ToLower
+            'Dim valStrL As String = Row(1).ToString().ToLower
             'valStr = Split(valStr, " ")(0)
             Dim valOrt As String = Row(3).ToString()
-
-            I
+            If textShort.Contains(valStr) Or textShortVar2.Contains(valStr) Or textShortVar3.Contains(valStr) Then
+                ' If text.Contains(valOrt) Then
+                Return Row(5).ToString
+            End If
+        Next
+        For Each Row As DataRow In dataSet.Tables(0).Rows
+            Dim valStr As String = Row(1).ToString().ToLower
+            'valStr = Split(valStr, " ")(0)
+            Dim valOrt As String = Row(3).ToString()
             If text.Contains(valStr) Then
                 ' If text.Contains(valOrt) Then
                 Return Row(5).ToString
             End If
-
-
-
-
-
-            ' End If
-
-
-
-
-
         Next
+
+
         Dim Ergebnis As String = ifNothingFoundFilter(text)
         Return Ergebnis
     End Function
@@ -243,9 +276,9 @@ Public Class Form1
         TextEd = Regex.Replace(Text, "str\.|Str\.", "straße")
         TextEd = Regex.Replace(Text, "\d", "")
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
-            If Row(0).Equals("133") Or Row(0).Equals("127") Then
-                Dim hilfsstringStrasse As String = Row(1).ToString.Trim()
-                Dim hilfsstringOrt As String = Row(3).ToString.Trim()
+
+            Dim hilfsstringStrasse As String = Row(1).ToString.Trim().ToLower
+            Dim hilfsstringOrt As String = Row(3).ToString.Trim()
                 If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
 
                 ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
@@ -255,7 +288,8 @@ Public Class Form1
                     Next
                     dataSetAfterF.Tables(0).Rows.Add(RowNew)
                 End If
-            End If
+
+
 
 
         Next
@@ -311,13 +345,14 @@ Public Class Form1
                         End If
                     Next
                 Next
-                'Dim formCheck As Form2 = New Form2
-                'formCheck.AdressePDF.Text = Text
-                'formCheck.stringTFeld = arrayValD
-                'formCheck.arrayRow = arrayRow
-                'formCheck.ShowDialog()
-            ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
-                Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
+            'Dim formCheck As Form2 = New Form2
+            'formCheck.AdressePDF.Text = Text
+            'formCheck.stringTFeld = arrayValD
+            'formCheck.arrayRow = arrayRow
+            'formCheck.setArray(arrayRow)
+            'formCheck.ShowDialog()
+        ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
+            Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
             Return Row(5).ToString
         Else
                 ifNothingFoundSQL(Text)
@@ -505,7 +540,7 @@ Public Class Form1
             ziel = "konnte nicht zugeordnet werden"
         End If
         Dim pdf_name As String = OpenFileDialog1.SafeFileName
-        Dim pathzielordner As String = "O:\LUVA Verwaltungs GmbH\Präsentation\Output\" + ziel
+        Dim pathzielordner As String = FolderPDF + "\Output\" + ziel
         Try
             Directory.CreateDirectory(pathzielordner)
         Catch ex As Exception
@@ -519,20 +554,20 @@ Public Class Form1
         FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         FolderBrowserDialog1.ShowDialog()
         Dim writerCSV As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\Auswertung.csv")
-        Dim konkat As String
-        Dim FolderPDF As String = FolderBrowserDialog1.SelectedPath
+        Dim konkat() As String
+        FolderPDF = FolderBrowserDialog1.SelectedPath
         Dim allFiles As String() = Directory.GetFiles(FolderPDF)
         Dim Ziel As String
         For Each s As String In allFiles
 
             konkat = extractObject(s)
-            writerCSV.Write(s + ";" + konkat + ";")
-            If konkat.Equals("") Then
+            writerCSV.Write(s + ";" + konkat(0) + ";")
+            If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
                 Ziel = ""
                 zuordnungPDF(s, Ziel)
 
             Else
-                Ziel = checkAdresse(konkat)
+                Ziel = checkAdresse(konkat(0), konkat(1))
                 writerCSV.Write(Ziel)
                 If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
                     zuordnungPDF(s, Ziel)
