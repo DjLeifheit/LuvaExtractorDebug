@@ -6,7 +6,7 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
-    Dim standardFilter As String() = {"WEG", "Objekt", "Firma", "WEG:", "GWE"}
+    Dim standardFilter As String() = {"WEG", "Objekt", "Firma", "WEG:", "GWE", "Objekt:"}
     Dim zielordner As String = ""
     Dim stadtFilterHSet As HashSet(Of String) = New HashSet(Of String)
     Dim dataSetFiltered As System.Data.DataSet
@@ -92,7 +92,7 @@ Public Class Form1
             Dim zeileWort() As String = Split(word, "~")
             'koorXWord = Double.Parse(zeileWort(0).Replace(".", ","))
             'koorYWord = Double.Parse(zeileWort(1).Replace(".", ","))
-            If zeileWort(8).Equals("WEG") Or zeileWort(8).Equals("WEG:") Then
+            If zeileWort(8).Equals("WEG") OrElse zeileWort(8).Equals("WEG:") OrElse zeileWort(8).Equals("GWE") Then
                 boolShort = True
             End If
             For Each s As String In standardFilter
@@ -206,18 +206,22 @@ Public Class Form1
         Dim textShortVar3 As String = ""
         textShort = textShort.ToLower
         text = text.ToLower
+        textShort = Regex.Replace(textShort, "mihlrain", "mühlrain")
         textShort = Regex.Replace(textShort, "hirschhomer", "hirschhorner")
         textShort = Regex.Replace(textShort, "\su\.\s", "+")
         textShort = Regex.Replace(textShort, "\s\+", "+")
         textShort = Regex.Replace(textShort, "str\.\s|str\s", "straße ")
         textShort = Regex.Replace(textShort, "Str\.\s| Str\s", "Straße ")
+        textShort = Regex.Replace(textShort, "Str\.", "Straße ")
+        textShort = Regex.Replace(textShort, "str\.", "straße ")
         textShort = Regex.Replace(textShort, "strasse", "straße")
         textShort = Regex.Replace(textShort, "Strasse", "Straße")
         textShort = Regex.Replace(textShort, "-v-", "-von-")
         textShort = Regex.Replace(textShort, "\s\s\s\s\s|\s\s\s\s|\s\s\s|\s\s", " ")
         textShort = Regex.Replace(textShort, "d\.", "der")
-        textShortVar2 = Regex.Replace(textShort, "straße", " Straße")
-        textShortVar3 = Regex.Replace(textShort, "\sStraße", " straße")
+        textShort = Regex.Replace(textShort, "bahnhofstraße 96", "")
+        textShortVar2 = Regex.Replace(textShort, "straße", " straße")
+        textShortVar3 = Regex.Replace(textShort, "\sstraße", "straße")
         text = Regex.Replace(text, "\su\.\s", "+")
         text = Regex.Replace(text, "Hirschhomer", "Hirschhorner")
         text = Regex.Replace(text, "str\.", "straße ")
@@ -227,6 +231,7 @@ Public Class Form1
         text = Regex.Replace(text, "-v-", "-von-")
         text = Regex.Replace(text, "\s\s\s\s\s|\s\s\s\s|\s\s\s|\s\s", " ")
         text = Regex.Replace(text, "d\.", "der")
+
         For Each Row As DataRow In dataSet.Tables(0).Rows
             Dim valStr As String = Row(1).ToString().ToLower
             'Dim valStrL As String = Row(1).ToString().ToLower
@@ -237,18 +242,24 @@ Public Class Form1
                 Return Row(5).ToString
             End If
         Next
-        For Each Row As DataRow In dataSet.Tables(0).Rows
-            Dim valStr As String = Row(1).ToString().ToLower
-            'valStr = Split(valStr, " ")(0)
-            Dim valOrt As String = Row(3).ToString()
-            If text.Contains(valStr) Then
-                ' If text.Contains(valOrt) Then
-                Return Row(5).ToString
-            End If
-        Next
+        Dim Ergebnis As String = ifNothingFoundFilter(textShort)
+        If IsNothing(Ergebnis) OrElse Ergebnis.Equals("") Then
+            For Each Row As DataRow In dataSet.Tables(0).Rows
+                Dim valStr As String = Row(1).ToString().ToLower
+                'valStr = Split(valStr, " ")(0)
+                Dim valOrt As String = Row(3).ToString()
+                If text.Contains(valStr) Then
+                    ' If text.Contains(valOrt) Then
+                    Return Row(5).ToString
+                End If
+            Next
+        Else
+            Return Ergebnis
+        End If
 
 
-        Dim Ergebnis As String = ifNothingFoundFilter(text)
+
+        Ergebnis = ifNothingFoundFilter(text)
         Return Ergebnis
     End Function
 
@@ -260,6 +271,8 @@ Public Class Form1
         Dim TextEd As String
         Dim dataTableAfterF As System.Data.DataTable
         dataTableAfterF = New System.Data.DataTable
+        dataSetAfterF.Clear()
+
         With dataTableAfterF.Columns
             .Add("Nr#")
             .Add("Objekt")
@@ -271,8 +284,9 @@ Public Class Form1
             .Add("iban")
             .Add("bic")
         End With
-
-        dataSetAfterF.Tables.Add(dataTableAfterF)
+        If dataSetAfterF.Tables.Count < 1 Then
+            dataSetAfterF.Tables.Add(dataTableAfterF)
+        End If
         TextEd = Regex.Replace(Text, "str\.|Str\.", "straße")
         TextEd = Regex.Replace(Text, "\d", "")
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
@@ -355,7 +369,7 @@ Public Class Form1
             Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
             Return Row(5).ToString
         Else
-            ifNothingFoundSQL(Text)
+            Return ifNothingFoundSQL(Text)
         End If
     End Function
     Public Function ifNothingFoundSQL(text As String)
@@ -438,6 +452,7 @@ Public Class Form1
                 ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
                     Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
                     Return Row(5).ToString
+                Else Return ""
                 End If
             End If
         Next
@@ -554,12 +569,14 @@ Public Class Form1
         FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         FolderBrowserDialog1.ShowDialog()
         Dim writerCSV As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\Auswertung.csv")
-        Dim konkat() As String
+        Dim konkat(1) As String
         FolderPDF = FolderBrowserDialog1.SelectedPath
         Dim allFiles As String() = Directory.GetFiles(FolderPDF)
         Dim Ziel As String
         For Each s As String In allFiles
-
+            Ziel = ""
+            konkat(0) = ""
+            konkat(1) = ""
             konkat = extractObject(s)
             writerCSV.Write(s + ";" + konkat(0) + ";")
             If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
