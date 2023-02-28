@@ -220,8 +220,8 @@ Public Class Form1
         textShort = Regex.Replace(textShort, "\s\s\s\s\s|\s\s\s\s|\s\s\s|\s\s", " ")
         textShort = Regex.Replace(textShort, "d\.", "der")
         textShort = Regex.Replace(textShort, "bahnhofstraße 96", "")
-        textShortVar2 = Regex.Replace(textShort, "straße", " straße")
-        textShortVar3 = Regex.Replace(textShort, "\sstraße", "straße")
+        textShortVar2 = Regex.Replace(textShort, "\s", "")
+        textShortVar2 = Regex.Replace(textShortVar2, "straße", "str")
         text = Regex.Replace(text, "\su\.\s", "+")
         text = Regex.Replace(text, "Hirschhomer", "Hirschhorner")
         text = Regex.Replace(text, "str\.", "straße ")
@@ -233,14 +233,19 @@ Public Class Form1
         text = Regex.Replace(text, "d\.", "der")
 
         For Each Row As DataRow In dataSet.Tables(0).Rows
-            Dim valStr As String = Row(1).ToString().ToLower
-            'Dim valStrL As String = Row(1).ToString().ToLower
-            'valStr = Split(valStr, " ")(0)
-            Dim valOrt As String = Row(3).ToString()
-            If textShort.Contains(valStr) Or textShortVar2.Contains(valStr) Or textShortVar3.Contains(valStr) Then
-                ' If text.Contains(valOrt) Then
-                Return Row(5).ToString
+            If Row(0).Equals("179") Then
+                Dim valStr As String = Row(1).ToString().ToLower
+                Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
+                valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
+                'Dim valStrL As String = Row(1).ToString().ToLower
+                'valStr = Split(valStr, " ")(0)
+                Dim valOrt As String = Row(3).ToString()
+                If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) Then
+                    ' If text.Contains(valOrt) Then
+                    Return Row(5).ToString
+                End If
             End If
+
         Next
         Dim Ergebnis As String = ifNothingFoundFilter(textShort)
         If IsNothing(Ergebnis) OrElse Ergebnis.Equals("") Then
@@ -292,16 +297,18 @@ Public Class Form1
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
 
             Dim hilfsstringStrasse As String = Row(1).ToString.Trim().ToLower
-            Dim hilfsstringOrt As String = Row(3).ToString.Trim()
-            If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
+                Dim hilfsstringOrt As String = Row(3).ToString.Trim()
+                If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
 
-            ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
-                Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
-                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
-                    RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
-                Next
-                dataSetAfterF.Tables(0).Rows.Add(RowNew)
-            End If
+                ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
+                    Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
+                    For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                        RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
+                    Next
+                    dataSetAfterF.Tables(0).Rows.Add(RowNew)
+                End If
+
+
 
 
 
@@ -365,6 +372,7 @@ Public Class Form1
             'formCheck.arrayRow = arrayRow
             'formCheck.setArray(arrayRow)
             'formCheck.ShowDialog()
+            Return ifNothingFoundSQL(Text)
         ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
             Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
             Return Row(5).ToString
@@ -449,6 +457,7 @@ Public Class Form1
                     Next
                     formCheck.stringTFeld = arrayValD
                     formCheck.arrayRow = arrayRow
+                    Return ""
                 ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
                     Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
                     Return Row(5).ToString
@@ -568,9 +577,15 @@ Public Class Form1
     Sub loadPDf()
         FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         FolderBrowserDialog1.ShowDialog()
-        Dim writerCSV As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\Auswertung.csv")
-        Dim konkat(1) As String
         FolderPDF = FolderBrowserDialog1.SelectedPath
+        Try
+            Directory.CreateDirectory(FolderPDF + "\Output")
+        Catch ex As Exception
+        End Try
+
+        Dim writerCSV As TextWriter = New StreamWriter(FolderPDF + "\Output\Auswertung.csv")
+        Dim konkat(1) As String
+
         Dim allFiles As String() = Directory.GetFiles(FolderPDF)
         Dim Ziel As String
         For Each s As String In allFiles
