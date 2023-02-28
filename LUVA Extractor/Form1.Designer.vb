@@ -37,6 +37,7 @@ Partial Class Form1
         Me.BasisPfadZumPDFOrdnerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.FolderBrowserDialog2 = New System.Windows.Forms.FolderBrowserDialog()
+        Me.BeschreibungToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -46,7 +47,7 @@ Partial Class Form1
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(372, 109)
+        Me.Button1.Location = New System.Drawing.Point(533, 377)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(131, 56)
         Me.Button1.TabIndex = 0
@@ -55,16 +56,16 @@ Partial Class Form1
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(12, 305)
+        Me.Button2.Location = New System.Drawing.Point(12, 377)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(131, 56)
         Me.Button2.TabIndex = 1
-        Me.Button2.Text = "Button2"
+        Me.Button2.Text = "Beenden"
         Me.Button2.UseVisualStyleBackColor = True
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FilterHinzufügenToolStripMenuItem, Me.SetupToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FilterHinzufügenToolStripMenuItem, Me.SetupToolStripMenuItem, Me.BeschreibungToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(676, 24)
@@ -105,11 +106,17 @@ Partial Class Form1
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(218, 131)
+        Me.Label1.Location = New System.Drawing.Point(384, 399)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(134, 13)
         Me.Label1.TabIndex = 3
         Me.Label1.Text = "Bitte PDF Ordner eingeben"
+        '
+        'BeschreibungToolStripMenuItem
+        '
+        Me.BeschreibungToolStripMenuItem.Name = "BeschreibungToolStripMenuItem"
+        Me.BeschreibungToolStripMenuItem.Size = New System.Drawing.Size(91, 20)
+        Me.BeschreibungToolStripMenuItem.Text = "Beschreibung"
         '
         'Form1
         '
@@ -142,4 +149,5 @@ Partial Class Form1
     Friend WithEvents Label1 As Label
     Friend WithEvents FolderBrowserDialog2 As FolderBrowserDialog
     Friend WithEvents BasisPfadZumPDFOrdnerToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BeschreibungToolStripMenuItem As ToolStripMenuItem
 End Class

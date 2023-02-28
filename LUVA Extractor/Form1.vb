@@ -240,8 +240,8 @@ Public Class Form1
         text = Regex.Replace(text, "bahnhofstraße 96", "")
         If Not textShort.Equals("") Then
             For Each Row As DataRow In dataSet.Tables(0).Rows
-                If Row(0).Equals("218") Then
-                    Dim valStr As String = Row(1).ToString().ToLower
+                'If Row(0).Equals("218") Then
+                Dim valStr As String = Row(1).ToString().ToLower
                     Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
                     valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
                     Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
@@ -253,7 +253,7 @@ Public Class Form1
                         ' If text.Contains(valOrt) Then
                         Return Row(5).ToString
                     End If
-                End If
+                ' End If
 
             Next
             Ergebnis = ifNothingFoundFilter(textShort)
@@ -584,40 +584,43 @@ Public Class Form1
     Sub loadPDf()
         FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         FolderBrowserDialog1.ShowDialog()
-        FolderPDF = FolderBrowserDialog1.SelectedPath
-        Try
-            Directory.CreateDirectory(FolderPDF + "\Output")
-        Catch ex As Exception
-        End Try
+        If FolderBrowserDialog1.ShowDialog = DialogResult.OK Then
+            FolderPDF = FolderBrowserDialog1.SelectedPath
+            Try
+                Directory.CreateDirectory(FolderPDF + "\Output")
+            Catch ex As Exception
+            End Try
 
-        Dim writerCSV As TextWriter = New StreamWriter(FolderPDF + "\Output\Auswertung.csv")
-        Dim konkat(1) As String
+            Dim writerCSV As TextWriter = New StreamWriter(FolderPDF + "\Output\Auswertung.csv")
+            Dim konkat(1) As String
 
-        Dim allFiles As String() = Directory.GetFiles(FolderPDF)
-        Dim Ziel As String
-        For Each s As String In allFiles
-            Ziel = ""
-            konkat(0) = ""
-            konkat(1) = ""
-            konkat = extractObject(s)
-            writerCSV.Write(s + ";" + konkat(0) + ";")
-            If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
+            Dim allFiles As String() = Directory.GetFiles(FolderPDF)
+            Dim Ziel As String
+            For Each s As String In allFiles
                 Ziel = ""
-                zuordnungPDF(s, Ziel)
-
-            Else
-                Ziel = checkAdresse(konkat(0), konkat(1))
-                writerCSV.Write(Ziel)
-                If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
-                    zuordnungPDF(s, Ziel)
-                Else
+                konkat(0) = ""
+                konkat(1) = ""
+                konkat = extractObject(s)
+                writerCSV.Write(s + ";" + konkat(0) + ";")
+                If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
                     Ziel = ""
                     zuordnungPDF(s, Ziel)
+
+                Else
+                    Ziel = checkAdresse(konkat(0), konkat(1))
+                    writerCSV.Write(Ziel)
+                    If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
+                        zuordnungPDF(s, Ziel)
+                    Else
+                        Ziel = ""
+                        zuordnungPDF(s, Ziel)
+                    End If
                 End If
-            End If
-            writerCSV.WriteLine()
-        Next
-        writerCSV.Close()
+                writerCSV.WriteLine()
+            Next
+            writerCSV.Close()
+        End If
+
     End Sub
 
     Public Sub addFilter(ByVal filter As String)
@@ -660,5 +663,13 @@ Public Class Form1
 
     Private Sub MenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStrip1.ItemClicked
 
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Me.Close()
+    End Sub
+
+    Private Sub BeschreibungToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BeschreibungToolStripMenuItem.Click
+        MsgBox("Nach dem sie die den Button Ordner wählen gedrückt haben können Sie den Pfad zu den PDf Dateien auswählen hierfür reicht der Ordner (Sie können nicht die PDFs einzeln auswählen). Nachdem Sie den Ordner mit den PDF Dateien ausgewählt und bestätigt haben, werden die PDF Dateien den richtigen Personen zugeteilt. PDF Dateien die nicht eindeutig zugeordnet werden können werden alle in einem Seperaten Ordner mit dem Namen: konnte nicht zugeordnet werden")
     End Sub
 End Class
