@@ -6,7 +6,7 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
-    Dim standardFilter As String() = {"WEG", "Objekt", "Firma", "WEG:", "GWE", "Objekt:"}
+    Dim standardFilter As String() = {"WEG", "Objekt", "Objekt:", "WEG:", "GWE"}
     Dim zielordner As String = ""
     Dim stadtFilterHSet As HashSet(Of String) = New HashSet(Of String)
     Dim dataSetFiltered As System.Data.DataSet
@@ -122,7 +122,7 @@ Public Class Form1
 
             '    'writer.Write(word)
             'End If
-            If boolShort = True And countShort < 9 Then
+            If contSKrit = True And countShort < 20 Then
 
                 textShort += zeileWort(8) + " "
                 countShort = countShort + 1
@@ -202,10 +202,16 @@ Public Class Form1
     'Funktion: Reverse Check prüft ob in der Adresse der Pdf straße und und Ort die in der Datenbank hinterlegt sind in dieser Konstelation vorhanden sind
     'wenn das nicht der Fall ist wird die gefilterte Variante geprüft 
     Public Function checkAdresse(text As String, textShort As String)
+        Dim textBackup As String = text
+        Dim Ergebnis As String = ""
         Dim textShortVar2 As String = ""
         Dim textShortVar3 As String = ""
+
         textShort = textShort.ToLower
         text = text.ToLower
+        textShort = Regex.Replace(textShort, "handschuhsheimer", "handschusheimer")
+        textShort = Regex.Replace(textShort, "sir\.", "str.")
+        textShort = Regex.Replace(textShort, "heideiberger", "heidelberger")
         textShort = Regex.Replace(textShort, "mihlrain", "mühlrain")
         textShort = Regex.Replace(textShort, "hirschhomer", "hirschhorner")
         textShort = Regex.Replace(textShort, "\su\.\s", "+")
@@ -222,45 +228,54 @@ Public Class Form1
         textShort = Regex.Replace(textShort, "bahnhofstraße 96", "")
         textShortVar2 = Regex.Replace(textShort, "\s", "")
         textShortVar2 = Regex.Replace(textShortVar2, "straße", "str")
+        If textShortVar2.StartsWith("weg") Then
+            textShortVar3 = textShortVar2.Substring(3)
+        End If
         text = Regex.Replace(text, "\su\.\s", "+")
         text = Regex.Replace(text, "Hirschhomer", "Hirschhorner")
-        text = Regex.Replace(text, "str\.", "straße ")
-        text = Regex.Replace(text, "Str\.", "Straße ")
+        text = Regex.Replace(text, "str\.|str\s", "straße ")
+        text = Regex.Replace(text, "Str\.|Str\s", "Straße ")
         text = Regex.Replace(text, "strasse", "straße")
         text = Regex.Replace(text, "Strasse", "Straße")
         text = Regex.Replace(text, "-v-", "-von-")
         text = Regex.Replace(text, "\s\s\s\s\s|\s\s\s\s|\s\s\s|\s\s", " ")
         text = Regex.Replace(text, "d\.", "der")
-
-        For Each Row As DataRow In dataSet.Tables(0).Rows
-            If Row(0).Equals("179") Then
-                Dim valStr As String = Row(1).ToString().ToLower
-                Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
-                valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
-                'Dim valStrL As String = Row(1).ToString().ToLower
-                'valStr = Split(valStr, " ")(0)
-                Dim valOrt As String = Row(3).ToString()
-                If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) Then
-                    ' If text.Contains(valOrt) Then
-                    Return Row(5).ToString
-                End If
-            End If
-
-        Next
-        Dim Ergebnis As String = ifNothingFoundFilter(textShort)
-        If IsNothing(Ergebnis) OrElse Ergebnis.Equals("") Then
+        text = Regex.Replace(text, "bahnhofstraße 96", "")
+        If Not textShort.Equals("") Then
             For Each Row As DataRow In dataSet.Tables(0).Rows
+                ' If Row(0).Equals("127") Then
                 Dim valStr As String = Row(1).ToString().ToLower
-                'valStr = Split(valStr, " ")(0)
-                Dim valOrt As String = Row(3).ToString()
-                If text.Contains(valStr) Then
-                    ' If text.Contains(valOrt) Then
-                    Return Row(5).ToString
-                End If
+                    Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
+                    valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
+                    Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
+                    valStr3 = Split(valStr3, "~")(0)
+                    'Dim valStrL As String = Row(1).ToString().ToLower
+                    'valStr = Split(valStr, " ")(0)
+                    Dim valOrt As String = Row(3).ToString()
+                    If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar3.StartsWith(valStr3) Then
+                        ' If text.Contains(valOrt) Then
+                        Return Row(5).ToString
+                    End If
+                '   End If
+
             Next
-        Else
-            Return Ergebnis
+            Ergebnis = ifNothingFoundFilter(textShort)
         End If
+        'If Ergebnis.Equals("") Then
+        '    For Each Row As DataRow In dataSet.Tables(0).Rows
+        '        Dim valStr As String = Row(1).ToString().ToLower
+        '        'valStr = Split(valStr, " ")(0)
+        '        Dim valOrt As String = Row(3).ToString()
+        '        If text.Contains(valStr) Then
+        '            ' If text.Contains(valOrt) Then
+        '            Return Row(5).ToString
+        '        Else
+        '        End If
+        '    Next
+        '    Return ifNothingFoundFilter(text)
+        'Else
+        '    Return Ergebnis
+        'End If
 
 
 
@@ -307,11 +322,6 @@ Public Class Form1
                     Next
                     dataSetAfterF.Tables(0).Rows.Add(RowNew)
                 End If
-
-
-
-
-
 
         Next
         If dataSetAfterF.Tables(0).Rows.Count > 1 Then
@@ -461,10 +471,10 @@ Public Class Form1
                 ElseIf dataSetAfterF.Tables(0).Rows.Count > 0 Then
                     Dim Row As DataRow = dataSetAfterF.Tables(0).Rows(0)
                     Return Row(5).ToString
-                Else Return ""
                 End If
             End If
         Next
+        Return ""
     End Function
 
     'Function dataBaseConnection()
