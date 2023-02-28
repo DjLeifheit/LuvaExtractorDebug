@@ -6,7 +6,8 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
-    Dim standardFilter As String() = {"WEG", "Objekt", "Objekt:", "WEG:", "GWE", "Kom.:", "MH", "Abrechnungseinheit", "Verbrauchsstelle:", "Liegenschaft"} '"Adresse AE" als Suchkriterium 
+    Dim counterNZB As Int32 = 0
+    Dim standardFilter As String() = {"WEG", "Objekt", "Objekt:", "WEG:", "GWE", "Kom.:", "MH", "Abrechnungseinheit", "Verbrauchsstelle:", "Liegenschaft", "Aktenzeichen:"} '"Adresse AE" als Suchkriterium 
     Dim zielordner As String = ""
     Dim stadtFilterHSet As HashSet(Of String) = New HashSet(Of String)
     Dim dataSetFiltered As System.Data.DataSet
@@ -21,6 +22,9 @@ Public Class Form1
     Dim dataSetAfterF As System.Data.DataSet
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim dateToday As Date
+        dateToday = Today
+        Date1.Text = dateToday
         Dim TextTest As String = "Bahnhofstr. 96 69151 Neckargemünd"
         table = New System.Data.DataTable
         With table.Columns
@@ -242,17 +246,17 @@ Public Class Form1
             For Each Row As DataRow In dataSet.Tables(0).Rows
                 'If Row(0).Equals("218") Then
                 Dim valStr As String = Row(1).ToString().ToLower
-                    Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
-                    valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
-                    Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
-                    valStr3 = Split(valStr3, "~")(0)
-                    'Dim valStrL As String = Row(1).ToString().ToLower
-                    'valStr = Split(valStr, " ")(0)
-                    Dim valOrt As String = Row(3).ToString()
-                    If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar2.StartsWith(valStr3) Then
-                        ' If text.Contains(valOrt) Then
-                        Return Row(5).ToString
-                    End If
+                Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
+                valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
+                Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
+                valStr3 = Split(valStr3, "~")(0)
+                'Dim valStrL As String = Row(1).ToString().ToLower
+                'valStr = Split(valStr, " ")(0)
+                Dim valOrt As String = Row(3).ToString()
+                If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar2.StartsWith(valStr3) Then
+                    ' If text.Contains(valOrt) Then
+                    Return Row(5).ToString
+                End If
                 ' End If
 
             Next
@@ -309,16 +313,16 @@ Public Class Form1
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
 
             Dim hilfsstringStrasse As String = Row(1).ToString.Trim().ToLower
-                Dim hilfsstringOrt As String = Row(3).ToString.Trim()
-                If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
+            Dim hilfsstringOrt As String = Row(3).ToString.Trim()
+            If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
 
-                ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
-                    Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
-                    For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
-                        RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
-                    Next
-                    dataSetAfterF.Tables(0).Rows.Add(RowNew)
-                End If
+            ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
+                Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
+                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                    RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
+                Next
+                dataSetAfterF.Tables(0).Rows.Add(RowNew)
+            End If
 
         Next
         If dataSetAfterF.Tables(0).Rows.Count > 1 Then
@@ -568,6 +572,7 @@ Public Class Form1
     Sub zuordnungPDF(pathPDF As String, ziel As String)
         OpenFileDialog1.FileName = pathPDF
         If ziel.Equals("") Or String.IsNullOrEmpty(ziel) Then
+            counterNZB = counterNZB + 1
             ziel = "konnte nicht zugeordnet werden"
         End If
         Dim pdf_name As String = OpenFileDialog1.SafeFileName
@@ -595,8 +600,16 @@ Public Class Form1
             Dim konkat(1) As String
 
             Dim allFiles As String() = Directory.GetFiles(FolderPDF)
+            TextBox2.Text = allFiles.Count.ToString
             Dim Ziel As String
+            Dim counterPDF As Int32 = 0
+            ProgressBar1.Maximum = allFiles.Count * 10
+            ProgressBar1.Visible = True
+            ProgressBarLabel.Text = "PDF " & 0 & " von " & allFiles.Count
+            'ProgressBarLabel.Visible = True
             For Each s As String In allFiles
+                counterPDF = counterPDF + 1
+                ProgressBarLabel.Text = "PDF " & counterPDF & " von " & allFiles.Count
                 Ziel = ""
                 konkat(0) = ""
                 konkat(1) = ""
@@ -617,7 +630,19 @@ Public Class Form1
                     End If
                 End If
                 writerCSV.WriteLine()
+                ProgressBar1.PerformStep()
             Next
+            'ProgressBarLabel.Visible = False
+            ProgressBar1.Visible = False
+            Dim sensivitaet As Double = 100 - 100 * counterNZB / allFiles.Count
+            sensivitaet = Math.Round(sensivitaet, 2)
+            TextBox3.Text = sensivitaet & "%"
+            TextBox1.Text = allFiles.Count - counterNZB & " PDF Dateien von " & allFiles.Count & " konnten zugeordnet werden, die restlichen " & counterNZB & " PDF Dateien wurden in einem seperaten Ordner abgelegt."
+            Label2.Visible = True
+            Label3.Visible = True
+            TextBox1.Visible = True
+            TextBox2.Visible = True
+            TextBox3.Visible = True
             writerCSV.Close()
         End If
 
@@ -672,4 +697,6 @@ Public Class Form1
     Private Sub BeschreibungToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BeschreibungToolStripMenuItem.Click
         MsgBox("Nach dem sie die den Button Ordner wählen gedrückt haben können Sie den Pfad zu den PDf Dateien auswählen hierfür reicht der Ordner (Sie können nicht die PDFs einzeln auswählen). Nachdem Sie den Ordner mit den PDF Dateien ausgewählt und bestätigt haben, werden die PDF Dateien den richtigen Personen zugeteilt. PDF Dateien die nicht eindeutig zugeordnet werden können werden alle in einem Seperaten Ordner mit dem Namen: konnte nicht zugeordnet werden")
     End Sub
+
+
 End Class
