@@ -6,7 +6,7 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
-    Dim standardFilter As String() = {"WEG", "Objekt", "Objekt:", "WEG:", "GWE"}
+    Dim standardFilter As String() = {"WEG", "Objekt", "Objekt:", "WEG:", "GWE", "Kom.:", "MH", "Abrechnungseinheit", "Verbrauchsstelle:", "Liegenschaft"} '"Adresse AE" als Suchkriterium 
     Dim zielordner As String = ""
     Dim stadtFilterHSet As HashSet(Of String) = New HashSet(Of String)
     Dim dataSetFiltered As System.Data.DataSet
@@ -95,19 +95,7 @@ Public Class Form1
             If zeileWort(8).Equals("WEG") OrElse zeileWort(8).Equals("WEG:") OrElse zeileWort(8).Equals("GWE") Then
                 boolShort = True
             End If
-            For Each s As String In standardFilter
-                Try
 
-
-                    If zeileWort(8).Equals(s) And counterFilter = 0 Then
-                        contSKrit = True
-                        counterFilter = counterFilter + 1
-                        'c += 1
-                    End If
-                Catch
-
-                End Try
-            Next
             'If cont = True And c = 1 Then
             '    cont = False
             '    Dim koordinatenPDF As New KoordinatenPDF()
@@ -136,6 +124,19 @@ Public Class Form1
                 End If
 
             End If
+            For Each s As String In standardFilter
+                Try
+
+
+                    If zeileWort(8).Equals(s) And counterFilter = 0 Then
+                        contSKrit = True
+                        counterFilter = counterFilter + 1
+                        'c += 1
+                    End If
+                Catch
+
+                End Try
+            Next
             'Hardcode
 
             'If koorXWord >= xAchse And koorXWord <= xAchse + 152 And koorYWord >= yAchse And koorYWord <= yAchse + 60 Then
@@ -205,7 +206,6 @@ Public Class Form1
         Dim textBackup As String = text
         Dim Ergebnis As String = ""
         Dim textShortVar2 As String = ""
-        Dim textShortVar3 As String = ""
 
         textShort = textShort.ToLower
         text = text.ToLower
@@ -228,9 +228,6 @@ Public Class Form1
         textShort = Regex.Replace(textShort, "bahnhofstraße 96", "")
         textShortVar2 = Regex.Replace(textShort, "\s", "")
         textShortVar2 = Regex.Replace(textShortVar2, "straße", "str")
-        If textShortVar2.StartsWith("weg") Then
-            textShortVar3 = textShortVar2.Substring(3)
-        End If
         text = Regex.Replace(text, "\su\.\s", "+")
         text = Regex.Replace(text, "Hirschhomer", "Hirschhorner")
         text = Regex.Replace(text, "str\.|str\s", "straße ")
@@ -243,8 +240,8 @@ Public Class Form1
         text = Regex.Replace(text, "bahnhofstraße 96", "")
         If Not textShort.Equals("") Then
             For Each Row As DataRow In dataSet.Tables(0).Rows
-                ' If Row(0).Equals("127") Then
-                Dim valStr As String = Row(1).ToString().ToLower
+                If Row(0).Equals("218") Then
+                    Dim valStr As String = Row(1).ToString().ToLower
                     Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
                     valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
                     Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
@@ -252,11 +249,11 @@ Public Class Form1
                     'Dim valStrL As String = Row(1).ToString().ToLower
                     'valStr = Split(valStr, " ")(0)
                     Dim valOrt As String = Row(3).ToString()
-                    If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar3.StartsWith(valStr3) Then
+                    If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar2.StartsWith(valStr3) Then
                         ' If text.Contains(valOrt) Then
                         Return Row(5).ToString
                     End If
-                '   End If
+                End If
 
             Next
             Ergebnis = ifNothingFoundFilter(textShort)
