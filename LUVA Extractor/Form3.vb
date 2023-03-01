@@ -9,7 +9,7 @@
             Filter = TextBox1.Text
             MsgBox("das eingegebene Suchkriterium wurde erfolgreich hinzugefügt")
         End If
-
+        Me.Close()
     End Sub
     Public Function getFilter()
         Return Filter

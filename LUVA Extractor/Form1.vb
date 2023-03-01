@@ -23,6 +23,7 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         mandantenInCombobox()
+        My.Settings.suchkriterien = "WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:"
         standardFilter = Split(My.Settings.suchkriterien, ";")
         Dim dateToday As Date
         dateToday = Today
@@ -713,9 +714,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub MenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStrip1.ItemClicked
-
-    End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Me.Close()
@@ -744,15 +742,38 @@ Public Class Form1
     Private Sub SuchkriteriumEntfernenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SuchkriteriumEntfernenToolStripMenuItem.Click
         Dim listeDel As New List(Of String)
         Dim suchKEntf As New SuchkriteriumEntfernen
-        For Each suchK In standardFilter
+        Dim listeAktuell As New List(Of String)
+        listeAktuell.Clear()
+        listeDel.Clear()
+
+        For Each s As String In standardFilter
+            listeAktuell.Add(s)
+        Next
+        For Each suchK As String In standardFilter
             suchKEntf.CheckedListBox1.Items.Add(suchK)
         Next
+        Dim mySettings As String = ""
         suchKEntf.ShowDialog()
         listeDel = suchKEntf.getDelList()
+        If IsNothing(listeDel) Then
 
-        For Each s As String In listeDel
+        Else
+            For Each s As String In listeDel
+                listeAktuell.Remove(s)
 
-        Next
+            Next
+            For i As Int32 = 0 To listeAktuell.Count - 1
+                If i = listeAktuell.Count - 1 Then
+                    mySettings += listeAktuell(i)
+                Else
+                    mySettings += listeAktuell(i) + ";"
+                End If
+            Next
+            My.Settings.suchkriterien = mySettings
+            standardFilter = Split(My.Settings.suchkriterien, ";")
+        End If
+
+
 
     End Sub
 
