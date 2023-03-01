@@ -49,6 +49,8 @@ Partial Class Form1
         Me.Date1 = New System.Windows.Forms.Label()
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
         Me.ProgressBarLabel = New System.Windows.Forms.Label()
+        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
+        Me.Label4 = New System.Windows.Forms.Label()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -258,11 +260,30 @@ Partial Class Form1
         Me.ProgressBarLabel.Text = "Label4"
         Me.ProgressBarLabel.Visible = False
         '
+        'ComboBox1
+        '
+        Me.ComboBox1.FormattingEnabled = True
+        Me.ComboBox1.Location = New System.Drawing.Point(12, 51)
+        Me.ComboBox1.Name = "ComboBox1"
+        Me.ComboBox1.Size = New System.Drawing.Size(273, 21)
+        Me.ComboBox1.TabIndex = 12
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(12, 35)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(93, 13)
+        Me.Label4.TabIndex = 13
+        Me.Label4.Text = "Aktueller Mandant"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(676, 445)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.ComboBox1)
         Me.Controls.Add(Me.ProgressBarLabel)
         Me.Controls.Add(Me.ProgressBar1)
         Me.Controls.Add(Me.Date1)
@@ -278,7 +299,7 @@ Partial Class Form1
         Me.Controls.Add(Me.MenuStrip1)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "Form1"
-        Me.Text = "infoDOCS Core-Luva"
+        Me.Text = "infoDOCS Core"
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
         Me.ResumeLayout(False)
@@ -310,4 +331,6 @@ Partial Class Form1
     Friend WithEvents ProgressBarLabel As Label
     Friend WithEvents SuchkriteriumHinzufügenToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SuchkriteriumEntfernenToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ComboBox1 As ComboBox
+    Friend WithEvents Label4 As Label
 End Class

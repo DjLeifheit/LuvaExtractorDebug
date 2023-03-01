@@ -22,6 +22,7 @@ Public Class Form1
     Dim dataSetAfterF As System.Data.DataSet
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        mandantenInCombobox()
         standardFilter = Split(My.Settings.suchkriterien, ";")
         Dim dateToday As Date
         dateToday = Today
@@ -49,7 +50,6 @@ Public Class Form1
         datatable()
         dataSetAnpassen()
         ' extractObject("O:\LUVA Verwaltungs GmbH\Testdaten_Produktion\10_DTFSD_01-13-2023_61.pdf")
-
         'erstellenStadtFilter()
         'ifNothingFoundFilter(TextTest)
 
@@ -581,7 +581,7 @@ Public Class Form1
         OpenFileDialog1.FileName = pathPDF
         If ziel.Equals("") Or String.IsNullOrEmpty(ziel) Then
             counterNZB = counterNZB + 1
-            ziel = "konnte nicht zugeordnet werden"
+            ziel = "input_failed"
         End If
         Dim pdf_name As String = OpenFileDialog1.SafeFileName
         Dim pathzielordner As String = FolderPDF + "\Output\" + ziel
@@ -754,5 +754,22 @@ Public Class Form1
 
         Next
 
+    End Sub
+
+    Private Sub mandantenInCombobox()
+
+    End Sub
+    Private Sub controller()
+        For i As Int32 = 0 To ComboBox1.Items.Count
+            Me.Name = "infoDOCS Core-" & ComboBox1.Items(i).ToString
+            ComboBox1.SelectedIndex = i
+        Next
+    End Sub
+    Private Sub datenBankabfrage(ByVal mandant As String)
+
+    End Sub
+    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+        datenBankabfrage(ComboBox1.SelectedItem)
+        loadPDf()
     End Sub
 End Class

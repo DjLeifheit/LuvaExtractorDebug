@@ -32,11 +32,11 @@ Partial Class Form3
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(313, 287)
+        Me.Button1.Location = New System.Drawing.Point(275, 287)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(101, 25)
+        Me.Button1.Size = New System.Drawing.Size(139, 25)
         Me.Button1.TabIndex = 0
-        Me.Button1.Text = "Filter hinzufügen"
+        Me.Button1.Text = "Suchkriterium hinzufügen"
         Me.Button1.UseVisualStyleBackColor = True
         '
         'TextBox1
@@ -52,9 +52,9 @@ Partial Class Form3
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label1.Location = New System.Drawing.Point(42, 240)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(140, 18)
+        Me.Label1.Size = New System.Drawing.Size(199, 18)
         Me.Label1.TabIndex = 2
-        Me.Label1.Text = "Bitte Filter eingeben "
+        Me.Label1.Text = "Bitte Suchkriterium eingeben "
         '
         'alleFilterAkt
         '
