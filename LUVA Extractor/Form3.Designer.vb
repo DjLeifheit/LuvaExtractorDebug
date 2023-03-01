@@ -25,20 +25,23 @@ Partial Class Form3
         Me.Button1 = New System.Windows.Forms.Button()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
+        Me.alleFilterAkt = New System.Windows.Forms.TextBox()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.Button2 = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(280, 61)
+        Me.Button1.Location = New System.Drawing.Point(313, 287)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(101, 25)
         Me.Button1.TabIndex = 0
-        Me.Button1.Text = "Button1"
+        Me.Button1.Text = "Filter hinzufügen"
         Me.Button1.UseVisualStyleBackColor = True
         '
         'TextBox1
         '
-        Me.TextBox1.Location = New System.Drawing.Point(12, 35)
+        Me.TextBox1.Location = New System.Drawing.Point(45, 261)
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.Size = New System.Drawing.Size(369, 20)
         Me.TextBox1.TabIndex = 1
@@ -46,18 +49,52 @@ Partial Class Form3
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 19)
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(42, 240)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(103, 13)
+        Me.Label1.Size = New System.Drawing.Size(140, 18)
         Me.Label1.TabIndex = 2
         Me.Label1.Text = "Bitte Filter eingeben "
+        '
+        'alleFilterAkt
+        '
+        Me.alleFilterAkt.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.alleFilterAkt.Location = New System.Drawing.Point(45, 45)
+        Me.alleFilterAkt.Multiline = True
+        Me.alleFilterAkt.Name = "alleFilterAkt"
+        Me.alleFilterAkt.ReadOnly = True
+        Me.alleFilterAkt.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.alleFilterAkt.Size = New System.Drawing.Size(369, 188)
+        Me.alleFilterAkt.TabIndex = 3
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.Location = New System.Drawing.Point(42, 21)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(173, 18)
+        Me.Label2.TabIndex = 4
+        Me.Label2.Text = "Alle aktuell genutzte Filter"
+        '
+        'Button2
+        '
+        Me.Button2.Location = New System.Drawing.Point(45, 287)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(75, 23)
+        Me.Button2.TabIndex = 5
+        Me.Button2.Text = "Zurück"
+        Me.Button2.UseVisualStyleBackColor = True
         '
         'Form3
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
-        Me.ClientSize = New System.Drawing.Size(400, 115)
+        Me.ClientSize = New System.Drawing.Size(462, 324)
+        Me.Controls.Add(Me.Button2)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.alleFilterAkt)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.TextBox1)
         Me.Controls.Add(Me.Button1)
@@ -72,4 +109,7 @@ Partial Class Form3
     Friend WithEvents Button1 As Button
     Friend WithEvents TextBox1 As TextBox
     Friend WithEvents Label1 As Label
+    Friend WithEvents alleFilterAkt As TextBox
+    Friend WithEvents Label2 As Label
+    Friend WithEvents Button2 As Button
 End Class

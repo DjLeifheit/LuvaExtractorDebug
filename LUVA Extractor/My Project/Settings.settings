@@ -11,5 +11,8 @@
     <Setting Name="basicPathPDf" Type="System.String" Scope="User">
       <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH\Testdaten_Produktion</Value>
     </Setting>
+    <Setting Name="suchkriterien" Type="System.String" Scope="User">
+      <Value Profile="(Default)">WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

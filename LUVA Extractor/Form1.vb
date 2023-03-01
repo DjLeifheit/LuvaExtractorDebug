@@ -7,7 +7,7 @@ Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
     Dim counterNZB As Int32 = 0
-    Dim standardFilter As String() = {"WEG", "Objekt", "Objekt:", "WEG:", "GWE", "Kom.:", "MH", "Abrechnungseinheit", "Verbrauchsstelle:", "Liegenschaft", "Aktenzeichen:"} '"Adresse AE" als Suchkriterium 
+    Dim standardFilter() As String ' = {"WEG", "Objekt", "Objekt:", "WEG:", "GWE", "Kom.:", "MH", "Abrechnungseinheit", "Verbrauchsstelle:", "Liegenschaft", "Aktenzeichen:"} '"Adresse AE" als Suchkriterium 
     Dim zielordner As String = ""
     Dim stadtFilterHSet As HashSet(Of String) = New HashSet(Of String)
     Dim dataSetFiltered As System.Data.DataSet
@@ -22,6 +22,7 @@ Public Class Form1
     Dim dataSetAfterF As System.Data.DataSet
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        standardFilter = Split(My.Settings.suchkriterien, ";")
         Dim dateToday As Date
         dateToday = Today
         Date1.Text = dateToday
@@ -245,20 +246,26 @@ Public Class Form1
         text = Regex.Replace(text, "bahnhofstraße 96", "")
         If Not textShort.Equals("") Then
             For Each Row As DataRow In dataSet.Tables(0).Rows
-                'If Row(0).Equals("218") Then
+                'If Row(0).Equals("076") Then
                 Dim valStr As String = Row(1).ToString().ToLower
-                Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
-                valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
-                Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
-                valStr3 = Split(valStr3, "~")(0)
-                'Dim valStrL As String = Row(1).ToString().ToLower
-                'valStr = Split(valStr, " ")(0)
-                Dim valOrt As String = Row(3).ToString()
-                If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar2.StartsWith(valStr3) Then
-                    ' If text.Contains(valOrt) Then
-                    Return Row(5).ToString
-                End If
-                ' End If
+                    Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
+                    valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
+                    Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
+                    valStr3 = Split(valStr3, "~")(0)
+                    valStr3 = Split(valStr3, ",")(0)
+                    Dim number As String = Regex.Replace(valStr3, "\D", "")
+                    valStr3 = Regex.Replace(valStr3, "[0-9][0-9][0-9][0-9][a-z]|[0-9][0-9][0-9][a-z]|[0-9][0-9][a-z]|[0-9][a-z]", number)
+
+
+
+                    'Dim valStrL As String = Row(1).ToString().ToLower
+                    'valStr = Split(valStr, " ")(0)
+                    Dim valOrt As String = Row(3).ToString()
+                    If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar2.StartsWith(valStr3) Then
+                        ' If text.Contains(valOrt) Then
+                        Return Row(5).ToString
+                    End If
+                'End If
 
             Next
             Ergebnis = ifNothingFoundFilter(textShort)
@@ -559,7 +566,7 @@ Public Class Form1
         Next
         '  Dim writer As TextWriter = New StreamWriter("C:\Users\vincent.rieker\source\repos\Luva Extractor\objektlisteTest.csv")
 
-        Dim ShowTable As String
+        Dim ShowTable As String = ""
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
             Dim hilfsstring As String = ""
             For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
@@ -614,6 +621,7 @@ Public Class Form1
             ProgressBarLabel.Text = "PDF " & 0 & " von " & allFiles.Count
             'ProgressBarLabel.Visible = True
             For Each s As String In allFiles
+                ergebnisListe.Clear()
                 counterPDF = counterPDF + 1
                 ProgressBarLabel.Text = "PDF " & counterPDF & " von " & allFiles.Count
                 Ziel = ""
@@ -632,7 +640,6 @@ Public Class Form1
                         writerCSV.WriteLine()
                     Next
                     If ergebnisListe.Count = 1 Then
-                        writerCSV.Write(Ziel)
                         zuordnungPDF(s, ergebnisListe(0))
                     Else zuordnungPDF(s, "")
                     End If
@@ -661,7 +668,7 @@ Public Class Form1
             Dim sensivitaet As Double = 100 - 100 * counterNZB / allFiles.Count
             sensivitaet = Math.Round(sensivitaet, 2)
             TextBox3.Text = sensivitaet & "%"
-            TextBox1.Text = allFiles.Count - counterNZB & " PDF Dateien von " & allFiles.Count & " konnten zugeordnet werden, die restlichen " & counterNZB & " PDF Dateien wurden in einem seperaten Ordner abgelegt."
+            TextBox1.Text = allFiles.Count - counterNZB & " PDF Dateien von " & allFiles.Count & " konnten zugeordnet werden, die restlichen " & counterNZB & " PDF Dateien wurden in einem seperaten Ordner Namens: konnte nicht zugeordnet werden      abgelegt."
             Label2.Visible = True
             Label3.Visible = True
             TextBox1.Visible = True
@@ -673,19 +680,16 @@ Public Class Form1
     End Sub
 
     Public Sub addFilter(ByVal filter As String)
-        Dim laengeA As Int32 = standardFilter.Length
-        Dim Hilfsarray(laengeA) As String
-        For a As Integer = 0 To laengeA - 1
-            Hilfsarray(a) = standardFilter(a)
-        Next
-        Hilfsarray(Hilfsarray.Length - 1) = filter
-        standardFilter = Hilfsarray
+        My.Settings.suchkriterien = My.Settings.suchkriterien & ";" & filter
+        standardFilter = Split(My.Settings.suchkriterien, ";")
     End Sub
 
     Private Sub StandardPfadFestlegenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles StandardPfadFestlegenToolStripMenuItem.Click
 
-        FolderBrowserDialog2.ShowDialog()
-        My.Settings.StandardPath = FolderBrowserDialog2.SelectedPath
+        If FolderBrowserDialog2.ShowDialog() = DialogResult.OK Then
+            My.Settings.StandardPath = FolderBrowserDialog2.SelectedPath
+        End If
+
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
@@ -694,20 +698,19 @@ Public Class Form1
 
     Private Sub PfadZurDatenbankFestlegenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PfadZurDatenbankFestlegenToolStripMenuItem.Click
         OpenFileDialog1.Filter = "Excel (*.xlsx)|*.xlsx"
-        OpenFileDialog1.ShowDialog()
-        My.Settings.DatenbankPath = OpenFileDialog1.FileName
+        OpenFileDialog1.FileName = My.Settings.DatenbankPath
+        If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
+            My.Settings.DatenbankPath = OpenFileDialog1.FileName
+        End If
+
     End Sub
 
     Private Sub BasisPfadZumPDFOrdnerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BasisPfadZumPDFOrdnerToolStripMenuItem.Click
         Dim folderbrowserDialogBPDF As New FolderBrowserDialog
-        folderbrowserDialogBPDF.ShowDialog()
-        My.Settings.basicPathPDf = folderbrowserDialogBPDF.SelectedPath
-    End Sub
+        If folderbrowserDialogBPDF.ShowDialog() = DialogResult.OK Then
+            My.Settings.basicPathPDf = folderbrowserDialogBPDF.SelectedPath
+        End If
 
-    Private Sub FilterHinzufügenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FilterHinzufügenToolStripMenuItem.Click
-        Dim formFilter As New Form3
-        formFilter.ShowDialog()
-        addFilter(formFilter.getFilter)
     End Sub
 
     Private Sub MenuStrip1_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStrip1.ItemClicked
@@ -720,5 +723,36 @@ Public Class Form1
 
     Private Sub BeschreibungToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BeschreibungToolStripMenuItem.Click
         MsgBox("Nach dem sie die den Button Ordner wählen gedrückt haben können Sie den Pfad zu den PDf Dateien auswählen hierfür reicht der Ordner (Sie können nicht die PDFs einzeln auswählen). Nachdem Sie den Ordner mit den PDF Dateien ausgewählt und bestätigt haben, werden die PDF Dateien den richtigen Personen zugeteilt. PDF Dateien die nicht eindeutig zugeordnet werden können werden alle in einem Seperaten Ordner mit dem Namen: konnte nicht zugeordnet werden")
+    End Sub
+
+    Private Sub SuchkriteriumHinzufügenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SuchkriteriumHinzufügenToolStripMenuItem.Click
+        Dim formFilter As New Form3
+        Dim c As Int32 = 1
+        Dim filtertext As String = ""
+        For Each s As String In standardFilter
+            filtertext += c & ". " & s & Environment.NewLine
+            c = c + 1
+        Next
+        formFilter.alleFilterAkt.Text = filtertext
+        formFilter.ShowDialog()
+        If formFilter.getFilter.Equals("") Then
+        Else
+            addFilter(formFilter.getFilter())
+        End If
+    End Sub
+
+    Private Sub SuchkriteriumEntfernenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SuchkriteriumEntfernenToolStripMenuItem.Click
+        Dim listeDel As New List(Of String)
+        Dim suchKEntf As New SuchkriteriumEntfernen
+        For Each suchK In standardFilter
+            suchKEntf.CheckedListBox1.Items.Add(suchK)
+        Next
+        suchKEntf.ShowDialog()
+        listeDel = suchKEntf.getDelList()
+
+        For Each s As String In listeDel
+
+        Next
+
     End Sub
 End Class

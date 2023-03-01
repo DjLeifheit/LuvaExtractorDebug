@@ -31,6 +31,8 @@ Partial Class Form1
         Me.Button2 = New System.Windows.Forms.Button()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.FilterHinzufügenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SuchkriteriumHinzufügenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SuchkriteriumEntfernenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SetupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StandardPfadFestlegenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PfadZurDatenbankFestlegenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -83,9 +85,22 @@ Partial Class Form1
         '
         'FilterHinzufügenToolStripMenuItem
         '
+        Me.FilterHinzufügenToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SuchkriteriumHinzufügenToolStripMenuItem, Me.SuchkriteriumEntfernenToolStripMenuItem})
         Me.FilterHinzufügenToolStripMenuItem.Name = "FilterHinzufügenToolStripMenuItem"
-        Me.FilterHinzufügenToolStripMenuItem.Size = New System.Drawing.Size(108, 20)
-        Me.FilterHinzufügenToolStripMenuItem.Text = "Filter hinzufügen"
+        Me.FilterHinzufügenToolStripMenuItem.Size = New System.Drawing.Size(147, 20)
+        Me.FilterHinzufügenToolStripMenuItem.Text = "Suchkriterien bearbeiten"
+        '
+        'SuchkriteriumHinzufügenToolStripMenuItem
+        '
+        Me.SuchkriteriumHinzufügenToolStripMenuItem.Name = "SuchkriteriumHinzufügenToolStripMenuItem"
+        Me.SuchkriteriumHinzufügenToolStripMenuItem.Size = New System.Drawing.Size(211, 22)
+        Me.SuchkriteriumHinzufügenToolStripMenuItem.Text = "Suchkriterium hinzufügen"
+        '
+        'SuchkriteriumEntfernenToolStripMenuItem
+        '
+        Me.SuchkriteriumEntfernenToolStripMenuItem.Name = "SuchkriteriumEntfernenToolStripMenuItem"
+        Me.SuchkriteriumEntfernenToolStripMenuItem.Size = New System.Drawing.Size(211, 22)
+        Me.SuchkriteriumEntfernenToolStripMenuItem.Text = "Suchkriterium entfernen"
         '
         'SetupToolStripMenuItem
         '
@@ -263,7 +278,7 @@ Partial Class Form1
         Me.Controls.Add(Me.MenuStrip1)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "Form1"
-        Me.Text = "Luva Extractor "
+        Me.Text = "infoDOCS Core-Luva"
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
         Me.ResumeLayout(False)
@@ -293,4 +308,6 @@ Partial Class Form1
     Friend WithEvents Date1 As Label
     Friend WithEvents ProgressBar1 As ProgressBar
     Friend WithEvents ProgressBarLabel As Label
+    Friend WithEvents SuchkriteriumHinzufügenToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SuchkriteriumEntfernenToolStripMenuItem As ToolStripMenuItem
 End Class
