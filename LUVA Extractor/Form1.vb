@@ -55,6 +55,8 @@ Public Class Form1
     End Sub
 
     Private Function extractObject(Pfad_PDF As String)
+        Dim listKrittext As New List(Of String)
+        listKrittext.Clear()
         Dim TextWithCoords As String
         Dim OCRdata As New List(Of OCRDataStruct)
         'Dim writer As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\text.txt")
@@ -96,9 +98,9 @@ Public Class Form1
             Dim zeileWort() As String = Split(word, "~")
             'koorXWord = Double.Parse(zeileWort(0).Replace(".", ","))
             'koorYWord = Double.Parse(zeileWort(1).Replace(".", ","))
-            If zeileWort(8).Equals("WEG") OrElse zeileWort(8).Equals("WEG:") OrElse zeileWort(8).Equals("GWE") Then
-                boolShort = True
-            End If
+            'If zeileWort(8).Equals("WEG") OrElse zeileWort(8).Equals("WEG:") OrElse zeileWort(8).Equals("GWE") Then
+            '    boolShort = True
+            'End If
 
             'If cont = True And c = 1 Then
             '    cont = False
@@ -114,33 +116,34 @@ Public Class Form1
 
             '    'writer.Write(word)
             'End If
-            If contSKrit = True And countShort < 20 Then
+            If contSKrit = True And countShort <= 20 Then
 
                 textShort += zeileWort(8) + " "
                 countShort = countShort + 1
-            End If
-            If contSKrit = True Then
                 konkat += zeileWort(8) + " "
-                count = count + 1
-                'writer.WriteLine(word)
-                If count = 20 Then
+                If countShort = 20 Then
+                    listKrittext.Add(textShort)
                     contSKrit = False
                 End If
 
             End If
-            For Each s As String In standardFilter
-                Try
+            If contSKrit = False Then
+                For Each s As String In standardFilter
+                    Try
+                        If zeileWort(8).Equals(s) Then
+                            contSKrit = True
+                            counterFilter = counterFilter + 1
+                            countShort = 0
+                            konkat = ""
+                            textShort = ""
+                            'c += 1
+                        End If
+                    Catch
 
+                    End Try
+                Next
+            End If
 
-                    If zeileWort(8).Equals(s) And counterFilter = 0 Then
-                        contSKrit = True
-                        counterFilter = counterFilter + 1
-                        'c += 1
-                    End If
-                Catch
-
-                End Try
-            Next
             'Hardcode
 
             'If koorXWord >= xAchse And koorXWord <= xAchse + 152 And koorYWord >= yAchse And koorYWord <= yAchse + 60 Then
@@ -153,9 +156,7 @@ Public Class Form1
             '    konkat += zeileWort(8).Replace("(", "").Replace(")", "") + " "
             'End If
         Next
-        Dim both(1) As String
-        both(0) = konkat
-        both(1) = textShort
+
         'writer.WriteLine("")
         'writer.WriteLine(konkat)
         'Dim Ergebnis As String = checkAdresse(konkat, textShort)
@@ -170,7 +171,7 @@ Public Class Form1
         'End With
         'OCRdata.Add(_tempOCRDataStruct)
         ' Next
-        Return both
+        Return listKrittext
     End Function
 
     'Private Sub Button1_Click(sender As Object, e As EventArgs)
@@ -588,8 +589,8 @@ Public Class Form1
     End Sub
     Sub loadPDf()
         FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
-        FolderBrowserDialog1.ShowDialog()
-        If FolderBrowserDialog1.ShowDialog = DialogResult.OK Then
+        'FolderBrowserDialog1.ShowDialog()
+        If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
             FolderPDF = FolderBrowserDialog1.SelectedPath
             Try
                 Directory.CreateDirectory(FolderPDF + "\Output")
@@ -597,12 +598,17 @@ Public Class Form1
             End Try
 
             Dim writerCSV As TextWriter = New StreamWriter(FolderPDF + "\Output\Auswertung.csv")
-            Dim konkat(1) As String
-
+            Dim konkat As New List(Of String)
+            Dim ergebnisListe As New HashSet(Of String)
             Dim allFiles As String() = Directory.GetFiles(FolderPDF)
             TextBox2.Text = allFiles.Count.ToString
             Dim Ziel As String
             Dim counterPDF As Int32 = 0
+            Label2.Visible = False
+            Label3.Visible = False
+            TextBox1.Visible = False
+            TextBox2.Visible = False
+            TextBox3.Visible = False
             ProgressBar1.Maximum = allFiles.Count * 10
             ProgressBar1.Visible = True
             ProgressBarLabel.Text = "PDF " & 0 & " von " & allFiles.Count
@@ -611,25 +617,43 @@ Public Class Form1
                 counterPDF = counterPDF + 1
                 ProgressBarLabel.Text = "PDF " & counterPDF & " von " & allFiles.Count
                 Ziel = ""
-                konkat(0) = ""
-                konkat(1) = ""
+                konkat.Clear()
                 konkat = extractObject(s)
-                writerCSV.Write(s + ";" + konkat(0) + ";")
-                If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
-                    Ziel = ""
-                    zuordnungPDF(s, Ziel)
-
+                If konkat.Count = 0 Then
+                    zuordnungPDF(s, "")
                 Else
-                    Ziel = checkAdresse(konkat(0), konkat(1))
-                    writerCSV.Write(Ziel)
-                    If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
-                        zuordnungPDF(s, Ziel)
-                    Else
-                        Ziel = ""
-                        zuordnungPDF(s, Ziel)
+                    For Each text As String In konkat
+                        writerCSV.Write(s + ";" + text + ";")
+                        Dim E As String = checkAdresse(text, text)
+                        If Not IsNothing(E) AndAlso Not E.Equals("") Then
+                            writerCSV.Write(E)
+                            ergebnisListe.Add(E)
+                        End If
+                        writerCSV.WriteLine()
+                    Next
+                    If ergebnisListe.Count = 1 Then
+                        writerCSV.Write(Ziel)
+                        zuordnungPDF(s, ergebnisListe(0))
+                    Else zuordnungPDF(s, "")
                     End If
                 End If
-                writerCSV.WriteLine()
+
+                'writerCSV.Write(s + ";" + konkat(0) + ";")
+                'If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
+                '    Ziel = ""
+                '    zuordnungPDF(s, Ziel)
+
+                'Else
+                '    Ziel = checkAdresse(konkat(0), konkat(1))
+                '    writerCSV.Write(Ziel)
+                '    If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
+                '        zuordnungPDF(s, Ziel)
+                '    Else
+                '        Ziel = ""
+                '        zuordnungPDF(s, Ziel)
+                '    End If
+                'End If
+                'writerCSV.WriteLine()
                 ProgressBar1.PerformStep()
             Next
             'ProgressBarLabel.Visible = False
@@ -697,6 +721,4 @@ Public Class Form1
     Private Sub BeschreibungToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BeschreibungToolStripMenuItem.Click
         MsgBox("Nach dem sie die den Button Ordner wählen gedrückt haben können Sie den Pfad zu den PDf Dateien auswählen hierfür reicht der Ordner (Sie können nicht die PDFs einzeln auswählen). Nachdem Sie den Ordner mit den PDF Dateien ausgewählt und bestätigt haben, werden die PDF Dateien den richtigen Personen zugeteilt. PDF Dateien die nicht eindeutig zugeordnet werden können werden alle in einem Seperaten Ordner mit dem Namen: konnte nicht zugeordnet werden")
     End Sub
-
-
 End Class

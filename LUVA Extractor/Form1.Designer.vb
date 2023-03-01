@@ -130,9 +130,10 @@ Partial Class Form1
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(108, 99)
+        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.Location = New System.Drawing.Point(115, 182)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(106, 13)
+        Me.Label2.Size = New System.Drawing.Size(158, 20)
         Me.Label2.TabIndex = 4
         Me.Label2.Text = "Anzahl PDF Dateien "
         Me.Label2.Visible = False
@@ -140,26 +141,27 @@ Partial Class Form1
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(108, 126)
+        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label3.Location = New System.Drawing.Point(115, 208)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(50, 13)
+        Me.Label3.Size = New System.Drawing.Size(76, 20)
         Me.Label3.TabIndex = 5
         Me.Label3.Text = "Spezifität"
         Me.Label3.Visible = False
         '
         'TextBox1
         '
-        Me.TextBox1.Location = New System.Drawing.Point(106, 148)
+        Me.TextBox1.Location = New System.Drawing.Point(119, 234)
         Me.TextBox1.Multiline = True
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.ReadOnly = True
-        Me.TextBox1.Size = New System.Drawing.Size(352, 52)
+        Me.TextBox1.Size = New System.Drawing.Size(398, 52)
         Me.TextBox1.TabIndex = 6
         Me.TextBox1.Visible = False
         '
         'TextBox2
         '
-        Me.TextBox2.Location = New System.Drawing.Point(220, 96)
+        Me.TextBox2.Location = New System.Drawing.Point(279, 182)
         Me.TextBox2.Name = "TextBox2"
         Me.TextBox2.ReadOnly = True
         Me.TextBox2.Size = New System.Drawing.Size(238, 20)
@@ -168,7 +170,7 @@ Partial Class Form1
         '
         'TextBox3
         '
-        Me.TextBox3.Location = New System.Drawing.Point(220, 122)
+        Me.TextBox3.Location = New System.Drawing.Point(279, 208)
         Me.TextBox3.Name = "TextBox3"
         Me.TextBox3.ReadOnly = True
         Me.TextBox3.Size = New System.Drawing.Size(238, 20)
@@ -221,11 +223,11 @@ Partial Class Form1
         Me.Date1.Name = "Date1"
         Me.Date1.Size = New System.Drawing.Size(61, 13)
         Me.Date1.TabIndex = 9
-        Me.Date1.Text = "04.28.2023"
+        Me.Date1.Text = "00.00.0000"
         '
         'ProgressBar1
         '
-        Me.ProgressBar1.Location = New System.Drawing.Point(163, 262)
+        Me.ProgressBar1.Location = New System.Drawing.Point(171, 263)
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(306, 23)
         Me.ProgressBar1.TabIndex = 10
