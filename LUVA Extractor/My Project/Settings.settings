@@ -9,7 +9,7 @@
       <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx</Value>
     </Setting>
     <Setting Name="basicPathPDf" Type="System.String" Scope="User">
-      <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH\Testdaten_Produktion</Value>
+      <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH</Value>
     </Setting>
     <Setting Name="suchkriterien" Type="System.String" Scope="User">
       <Value Profile="(Default)">WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:</Value>

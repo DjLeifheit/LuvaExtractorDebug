@@ -595,87 +595,91 @@ Public Class Form1
         My.Computer.FileSystem.CopyFile(pathPDF, pathzielordner, True)
 
     End Sub
-    Sub loadPDf()
-        FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
+    Sub loadPDf(ByVal path As String)
+        'FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         'FolderBrowserDialog1.ShowDialog()
-        If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
-            FolderPDF = FolderBrowserDialog1.SelectedPath
-            Try
-                Directory.CreateDirectory(FolderPDF + "\Output")
-            Catch ex As Exception
-            End Try
+        'If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
+        FolderPDF = path
+        'getAllDirectories(FolderPDF)
+        Try
+            Directory.CreateDirectory(FolderPDF + "\Output")
+        Catch ex As Exception
+        End Try
 
-            Dim writerCSV As TextWriter = New StreamWriter(FolderPDF + "\Output\Auswertung.csv")
-            Dim konkat As New List(Of String)
-            Dim ergebnisListe As New HashSet(Of String)
-            Dim allFiles As String() = Directory.GetFiles(FolderPDF)
-            TextBox2.Text = allFiles.Count.ToString
-            Dim Ziel As String
-            Dim counterPDF As Int32 = 0
-            Label2.Visible = False
-            Label3.Visible = False
-            TextBox1.Visible = False
-            TextBox2.Visible = False
-            TextBox3.Visible = False
-            ProgressBar1.Maximum = allFiles.Count * 10
-            ProgressBar1.Visible = True
-            ProgressBarLabel.Text = "PDF " & 0 & " von " & allFiles.Count
-            'ProgressBarLabel.Visible = True
-            For Each s As String In allFiles
-                ergebnisListe.Clear()
-                counterPDF = counterPDF + 1
-                ProgressBarLabel.Text = "PDF " & counterPDF & " von " & allFiles.Count
-                Ziel = ""
-                konkat.Clear()
-                konkat = extractObject(s)
-                If konkat.Count = 0 Then
-                    zuordnungPDF(s, "")
-                Else
-                    For Each text As String In konkat
-                        writerCSV.Write(s + ";" + text + ";")
-                        Dim E As String = checkAdresse(text, text)
-                        If Not IsNothing(E) AndAlso Not E.Equals("") Then
-                            writerCSV.Write(E)
-                            ergebnisListe.Add(E)
-                        End If
-                        writerCSV.WriteLine()
-                    Next
-                    If ergebnisListe.Count = 1 Then
-                        zuordnungPDF(s, ergebnisListe(0))
-                    Else zuordnungPDF(s, "")
+        Dim writerCSV As TextWriter = New StreamWriter(FolderPDF + "\Output\Auswertung.csv")
+        Dim konkat As New List(Of String)
+        Dim ergebnisListe As New HashSet(Of String)
+        Dim allFiles As String() = Directory.GetFiles(FolderPDF)
+        TextBox2.Text = allFiles.Count.ToString
+        Dim Ziel As String
+        Dim counterPDF As Int32 = 0
+        Label2.Visible = False
+        Label3.Visible = False
+        TextBox1.Visible = False
+        TextBox2.Visible = False
+        TextBox3.Visible = False
+        ProgressBar1.Maximum = allFiles.Count * 10
+        ProgressBar1.Visible = True
+        ProgressBarLabel.Text = "PDF " & 0 & " von " & allFiles.Count
+        'ProgressBarLabel.Visible = True
+        For Each s As String In allFiles
+            ergebnisListe.Clear()
+            counterPDF = counterPDF + 1
+            ProgressBarLabel.Text = "PDF " & counterPDF & " von " & allFiles.Count
+            Ziel = ""
+            konkat.Clear()
+            konkat = extractObject(s)
+            If konkat.Count = 0 Then
+                zuordnungPDF(s, "")
+            Else
+                For Each text As String In konkat
+                    writerCSV.Write(s + ";" + text + ";")
+                    Dim E As String = checkAdresse(text, text)
+                    If Not IsNothing(E) AndAlso Not E.Equals("") Then
+                        writerCSV.Write(E)
+                        ergebnisListe.Add(E)
                     End If
+                    writerCSV.WriteLine()
+                Next
+                If ergebnisListe.Count = 1 Then
+                    zuordnungPDF(s, ergebnisListe(0))
+                Else zuordnungPDF(s, "")
                 End If
-                'writerCSV.Write(s + ";" + konkat(0) + ";")
-                'If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
-                '    Ziel = ""
-                '    zuordnungPDF(s, Ziel)
+            End If
+            'writerCSV.Write(s + ";" + konkat(0) + ";")
+            'If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
+            '    Ziel = ""
+            '    zuordnungPDF(s, Ziel)
 
-                'Else
-                '    Ziel = checkAdresse(konkat(0), konkat(1))
-                '    writerCSV.Write(Ziel)
-                '    If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
-                '        zuordnungPDF(s, Ziel)
-                '    Else
-                '        Ziel = ""
-                '        zuordnungPDF(s, Ziel)
-                '    End If
-                'End If
-                'writerCSV.WriteLine()
-                ProgressBar1.PerformStep()
-            Next
-            'ProgressBarLabel.Visible = False
-            ProgressBar1.Visible = False
-            Dim sensivitaet As Double = 100 - 100 * counterNZB / allFiles.Count
-            sensivitaet = Math.Round(sensivitaet, 2)
-            TextBox3.Text = sensivitaet & "%"
-            TextBox1.Text = allFiles.Count - counterNZB & " PDF Dateien von " & allFiles.Count & " konnten zugeordnet werden, die restlichen " & counterNZB & " PDF Dateien wurden in einem seperaten Ordner Namens: konnte nicht zugeordnet werden      abgelegt."
-            Label2.Visible = True
-            Label3.Visible = True
-            TextBox1.Visible = True
-            TextBox2.Visible = True
-            TextBox3.Visible = True
-            writerCSV.Close()
-        End If
+            'Else
+            '    Ziel = checkAdresse(konkat(0), konkat(1))
+            '    writerCSV.Write(Ziel)
+            '    If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
+            '        zuordnungPDF(s, Ziel)
+            '    Else
+            '        Ziel = ""
+            '        zuordnungPDF(s, Ziel)
+            '    End If
+            'End If
+            'writerCSV.WriteLine()
+            ProgressBar1.PerformStep()
+        Next
+        'ProgressBarLabel.Visible = False
+        ProgressBar1.Visible = False
+        Dim spezifitaet As Double = 100 - 100 * counterNZB / allFiles.Count
+        spezifitaet = Math.Round(spezifitaet, 2)
+        TextBox3.Text = spezifitaet & "%"
+        TextBox1.Text = allFiles.Count - counterNZB & " PDF Dateien von " & allFiles.Count & " konnten zugeordnet werden, die restlichen " & counterNZB & " PDF Dateien wurden in einem seperaten Ordner Namens: konnte nicht zugeordnet werden      abgelegt."
+        Label2.Visible = True
+        Label3.Visible = True
+        TextBox1.Visible = True
+        TextBox2.Visible = True
+        TextBox3.Visible = True
+        writerCSV.WriteLine()
+        writerCSV.WriteLine("Spetzifität: " & spezifitaet & "%")
+        writerCSV.WriteLine("Zuordnung: " & allFiles.Count - counterNZB & " von " & allFiles.Count)
+        writerCSV.Close()
+        'End If
 
     End Sub
 
@@ -693,7 +697,15 @@ Public Class Form1
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        loadPDf()
+        'FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
+        'FolderBrowserDialog1.ShowDialog()
+        If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
+            Dim path As String = FolderBrowserDialog1.SelectedPath
+            getAllDirectories(path)
+
+        End If
+
+        'loadPDf()
     End Sub
 
     Private Sub PfadZurDatenbankFestlegenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PfadZurDatenbankFestlegenToolStripMenuItem.Click
@@ -774,19 +786,31 @@ Public Class Form1
     End Sub
 
     Private Sub mandantenInCombobox()
+        ComboBox1.Items.Add("Luva")
 
     End Sub
     Private Sub controller()
         For i As Int32 = 0 To ComboBox1.Items.Count
             Me.Name = "infoDOCS Core-" & ComboBox1.Items(i).ToString
             ComboBox1.SelectedIndex = i
+            Me.Name = "infoDOCS Core-" & ComboBox1.Items(i).ToString
         Next
     End Sub
     Private Sub datenBankabfrage(ByVal mandant As String)
 
     End Sub
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+        ' Me.Name = "infoDOCS Core-" & ComboBox1.SelectedItem.ToString
         datenBankabfrage(ComboBox1.SelectedItem)
-        loadPDf()
     End Sub
+    Private Sub getAllDirectories(ByVal path As String)
+        Dim di As DirectoryInfo = New DirectoryInfo(path)
+        Dim directories() As DirectoryInfo
+        directories = di.GetDirectories("*", SearchOption.AllDirectories)
+        For i As Int32 = 0 To directories.Length - 1
+            AlleDirectories.Items.Add(directories(i).FullName)
+            loadPDf(directories(i).FullName)
+        Next
+    End Sub
+
 End Class

@@ -51,6 +51,8 @@ Partial Class Form1
         Me.ProgressBarLabel = New System.Windows.Forms.Label()
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.Label4 = New System.Windows.Forms.Label()
+        Me.AlleDirectories = New System.Windows.Forms.ComboBox()
+        Me.Label5 = New System.Windows.Forms.Label()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -81,7 +83,7 @@ Partial Class Form1
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FilterHinzufügenToolStripMenuItem, Me.SetupToolStripMenuItem, Me.BeschreibungToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(676, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(912, 24)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -277,11 +279,30 @@ Partial Class Form1
         Me.Label4.TabIndex = 13
         Me.Label4.Text = "Aktueller Mandant"
         '
+        'AlleDirectories
+        '
+        Me.AlleDirectories.FormattingEnabled = True
+        Me.AlleDirectories.Location = New System.Drawing.Point(380, 51)
+        Me.AlleDirectories.Name = "AlleDirectories"
+        Me.AlleDirectories.Size = New System.Drawing.Size(520, 21)
+        Me.AlleDirectories.TabIndex = 14
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(308, 35)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(80, 13)
+        Me.Label5.TabIndex = 15
+        Me.Label5.Text = "Alle Directories "
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(676, 445)
+        Me.ClientSize = New System.Drawing.Size(912, 445)
+        Me.Controls.Add(Me.Label5)
+        Me.Controls.Add(Me.AlleDirectories)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.ComboBox1)
         Me.Controls.Add(Me.ProgressBarLabel)
@@ -333,4 +354,6 @@ Partial Class Form1
     Friend WithEvents SuchkriteriumEntfernenToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ComboBox1 As ComboBox
     Friend WithEvents Label4 As Label
+    Friend WithEvents AlleDirectories As ComboBox
+    Friend WithEvents Label5 As Label
 End Class
