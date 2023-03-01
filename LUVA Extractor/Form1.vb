@@ -23,7 +23,7 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         mandantenInCombobox()
-        My.Settings.suchkriterien = "WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:"
+        'My.Settings.suchkriterien = "WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:"
         standardFilter = Split(My.Settings.suchkriterien, ";")
         Dim dateToday As Date
         dateToday = Today
@@ -645,7 +645,6 @@ Public Class Form1
                     Else zuordnungPDF(s, "")
                     End If
                 End If
-
                 'writerCSV.Write(s + ";" + konkat(0) + ";")
                 'If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
                 '    Ziel = ""
@@ -772,9 +771,6 @@ Public Class Form1
             My.Settings.suchkriterien = mySettings
             standardFilter = Split(My.Settings.suchkriterien, ";")
         End If
-
-
-
     End Sub
 
     Private Sub mandantenInCombobox()
