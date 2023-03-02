@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="StandardPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH\Präsentation\Output</Value>
+      <Value Profile="(Default)">\\server\Organisation\LUVA Verwaltungs GmbH\TestDatenO</Value>
     </Setting>
     <Setting Name="DatenbankPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx</Value>
     </Setting>
     <Setting Name="basicPathPDf" Type="System.String" Scope="User">
-      <Value Profile="(Default)">O:\LUVA Verwaltungs GmbH\TestDatenO</Value>
+      <Value Profile="(Default)">\\nas5\Indizierung\GoPhoenix\Luva</Value>
     </Setting>
     <Setting Name="suchkriterien" Type="System.String" Scope="User">
       <Value Profile="(Default)">WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:</Value>

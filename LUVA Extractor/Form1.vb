@@ -6,6 +6,12 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
+    Dim nameMandanten As String
+
+    Dim spalteSuche As Int32
+    Dim spalteErgebnis As Int32
+    Dim endberichtAPDF As Int32 = 0
+    Dim endberichtNZB As Int32 = 0
     Dim counterNZB As Int32 = 0
     Dim standardFilter() As String ' = {"WEG", "Objekt", "Objekt:", "WEG:", "GWE", "Kom.:", "MH", "Abrechnungseinheit", "Verbrauchsstelle:", "Liegenschaft", "Aktenzeichen:"} '"Adresse AE" als Suchkriterium 
     Dim zielordner As String = ""
@@ -20,16 +26,24 @@ Public Class Form1
     Dim dataSetErgebnisSQLLike As DataSet
     Dim Excel As New Microsoft.Office.Interop.Excel.Application
     Dim dataSetAfterF As System.Data.DataSet
-
+    ''' <summary>
+    ''' mandanten in Combobox füllen
+    ''' Schagwörter der liste zuweisen 
+    ''' Erstellen der hilfstabelle für die gefilterten Daten 
+    ''' Datum setzen 
+    ''' Verbindung zur Datenbank/ Excel File 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         mandantenInCombobox()
         'My.Settings.suchkriterien = "WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:"
+        '!!!Überarbeiten auf Datenbank!!! 
         standardFilter = Split(My.Settings.suchkriterien, ";")
-        My.Settings.basicPathPDf = "O:\LUVA Verwaltungs GmbH\TestDatenO"
+        'y.Settings.basicPathPDf = "O:\LUVA Verwaltungs GmbH\TestDatenO"
         Dim dateToday As Date
         dateToday = Today
         Date1.Text = dateToday
-        Dim TextTest As String = "Bahnhofstr. 96 69151 Neckargemünd"
         table = New System.Data.DataTable
         With table.Columns
             .Add("Nr#")
@@ -71,8 +85,6 @@ Public Class Form1
 
                 ' https://www.gdpicture.com/guides/gdpicture/GdPicture.NET.14~GdPicture14.GdPicturePDF~GetPageTextWithCoords(String).html
                 TextWithCoords = .GetPageTextWithCoords("~")
-
-
                 'writer.Write(TextWithCoords)
 
                 .CloseDocument()
@@ -188,6 +200,9 @@ Public Class Form1
         ExcelT.Workbooks.Open("O:\LUVA Verwaltungs GmbH\Testdaten\Kopie von objektliste neu.xlsx")
 
     End Sub
+    ''' <summary>
+    ''' Erstellt eine Liste aller Städte aus der Datenbank um einen 2. Check zu erhalten in Kombination mit Straße und Stadt
+    ''' </summary>
     Private Sub erstellenStadtFilter()
         For Each Row As DataRow In dataSet.Tables(0).Rows
             stadtFilterHSet.Add(Row(3))
@@ -209,14 +224,32 @@ Public Class Form1
 
     'Checkt ob die Adresse (Straße und Wohnort) in dieser Kombination in der Datenbank vorhanden ist
     'Funktion: Reverse Check prüft ob in der Adresse der Pdf straße und und Ort die in der Datenbank hinterlegt sind in dieser Konstelation vorhanden sind
-    'wenn das nicht der Fall ist wird die gefilterte Variante geprüft 
+    'wenn das nicht der Fall ist wird die gefilterte Variante geprüft
+    '3 vergleichsoperatoren
+    '1. Operator: textShort.Contains(valStr)
+    '       textShort = übergebener Text alles klein geschrieben 
+    '       valStr = Straße aus der Datenbank alles klein geschrieben 
+    '2. Operator: textShortVar2.Contains(valStrVar2)
+    '       textShortVar2 = übergebener Text alles klein geschrieben und ohne Leerzeichen
+    '       valStrVar2 = Straße aus der Datenbank alles klein geschrieben und ohne Leerzeichen
+    '3. Operator: textShortVar2.StartsWith(valStr3) prüfen ob textShortVar2 mit valStr3
+    '       textShortVar2 = übergebener Text alles klein geschrieben und ohne Leerzeichen
+    '       valStrVar3 = valStrVar2 nur mit der ersten nummer nach dem Straßen nahmen bsp Straße: Bahnhofstraße 22/4+23 -> valStrVar3: bahnhofstr22
     Public Function checkAdresse(text As String, textShort As String)
+        textShort = Regex.Replace(textShort, "nuBloch", "nußloch")
+        textShort = Regex.Replace(textShort, "NuBloch", "Nußloch")
+        textShort = Regex.Replace(textShort, "straBe", "straße")
+        textShort = Regex.Replace(textShort, "StraBe", "Straße")
+
         Dim textBackup As String = text
         Dim Ergebnis As String = ""
         Dim textShortVar2 As String = ""
 
         textShort = textShort.ToLower
         text = text.ToLower
+        textShort = Regex.Replace(textShort, "}", ")")
+        textShort = Regex.Replace(textShort, "{", "(")
+        textShort = Regex.Replace(textShort, "nubloch", "nußloch")
         textShort = Regex.Replace(textShort, "handschuhsheimer", "handschusheimer")
         textShort = Regex.Replace(textShort, "sir\.", "str.")
         textShort = Regex.Replace(textShort, "heideiberger", "heidelberger")
@@ -248,26 +281,26 @@ Public Class Form1
         text = Regex.Replace(text, "bahnhofstraße 96", "")
         If Not textShort.Equals("") Then
             For Each Row As DataRow In dataSet.Tables(0).Rows
-                'If Row(0).Equals("076") Then
+                'If Row(0).Equals("009") Then
                 Dim valStr As String = Row(1).ToString().ToLower
-                    Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
-                    valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
-                    Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
-                    valStr3 = Split(valStr3, "~")(0)
-                    valStr3 = Split(valStr3, ",")(0)
-                    Dim number As String = Regex.Replace(valStr3, "\D", "")
-                    valStr3 = Regex.Replace(valStr3, "[0-9][0-9][0-9][0-9][a-z]|[0-9][0-9][0-9][a-z]|[0-9][0-9][a-z]|[0-9][a-z]", number)
+                Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
+                valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
+                Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
+                valStr3 = Split(valStr3, "~")(0)
+                valStr3 = Split(valStr3, ",")(0)
+                Dim number As String = Regex.Replace(valStr3, "\D", "")
+                valStr3 = Regex.Replace(valStr3, "[0-9][0-9][0-9][0-9][a-z]|[0-9][0-9][0-9][a-z]|[0-9][0-9][a-z]|[0-9][a-z]", number)
 
 
 
-                    'Dim valStrL As String = Row(1).ToString().ToLower
-                    'valStr = Split(valStr, " ")(0)
-                    Dim valOrt As String = Row(3).ToString()
-                    If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar2.StartsWith(valStr3) Then
-                        ' If text.Contains(valOrt) Then
-                        Return Row(5).ToString
-                    End If
-                'End If
+                'Dim valStrL As String = Row(1).ToString().ToLower
+                'valStr = Split(valStr, " ")(0)
+                Dim valOrt As String = Row(3).ToString()
+                If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar2.StartsWith(valStr3) Then
+                    ' If text.Contains(valOrt) Then
+                    Return Row(5).ToString
+                End If
+                ' End If
 
             Next
             Ergebnis = ifNothingFoundFilter(textShort)
@@ -401,6 +434,14 @@ Public Class Form1
             Return ifNothingFoundSQL(Text)
         End If
     End Function
+
+    ''' <summary>
+    '''  Wird aufgerufen wenn in der Methode ifNothingFoundFiltered auch nichts gefunden 
+    '''  Stellt eine Anfrage an die Datenbank ob sich in der Datenbank in der Spalte Objekt etwas befinden was sich den Daten aus der PDF ähnelt dafür 
+    '''  Prüfen wir jedes einzelne wort aus den daten der Datennk welches länger als 3 Buchstaben ist.
+    ''' </summary>
+    ''' <param name="text"></param>
+    ''' <returns></returns>
     Public Function ifNothingFoundSQL(text As String)
         Dim Filterused As String = ""
 
@@ -579,6 +620,11 @@ Public Class Form1
         Next
 
     End Sub
+    ''' <summary>
+    ''' Die PDF wird im Output unter der richtigen Person abgespeichert wenn keine passende Person in check adress gefunden wurde wird 
+    ''' </summary>
+    ''' <param name="pathPDF"></param>
+    ''' <param name="ziel"></param>
     Sub zuordnungPDF(pathPDF As String, ziel As String)
         OpenFileDialog1.FileName = pathPDF
         If ziel.Equals("") Or String.IsNullOrEmpty(ziel) Then
@@ -596,6 +642,12 @@ Public Class Form1
         My.Computer.FileSystem.CopyFile(pathPDF, pathzielordner, True)
 
     End Sub
+
+    ''' <summary>
+    ''' der Methode wird der Pfad zu dem SubOrdner übergeben. Diese Methode kümmert sich darum dass alle PDF dateien in dem SubOrdnern zugeordnet werden 
+    ''' dafür ruft die Methode für jede PDF Datei in dem SubOrdner die Methoden extractObject, checkAdresse und zuordnungPDF nacheinander auf. Zudem erstellt sie eine CSV Datei mit der Auswertung für jeden einzelnen Ordner
+    ''' </summary>
+    ''' <param name="path"></param>
     Sub loadPDf(ByVal path As String)
         'FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         'FolderBrowserDialog1.ShowDialog()
@@ -636,7 +688,9 @@ Public Class Form1
                     zuordnungPDF(s, "")
                 Else
                     For Each text As String In konkat
-                        writerCSV.Write(s + ";" + text + ";")
+                        text = Regex.Replace(text, "}", ")")
+                        text = Regex.Replace(text, "{", "(")
+                        writerCSV.Write(s + ";" + text + ";", System.Text.Encoding.Default)
                         Dim E As String = checkAdresse(text, text)
                         If Not IsNothing(E) AndAlso Not E.Equals("") Then
                             writerCSV.Write(E)
@@ -672,7 +726,7 @@ Public Class Form1
             Dim spezifitaet As Double = 100 - 100 * counterNZB / allFiles.Count
             spezifitaet = Math.Round(spezifitaet, 2)
             TextBox3.Text = spezifitaet & "%"
-            TextBox1.Text = allFiles.Count - counterNZB & " PDF Dateien von " & allFiles.Count & " konnten zugeordnet werden, die restlichen " & counterNZB & " PDF Dateien wurden in einem seperaten Ordner Namens: konnte nicht zugeordnet werden      abgelegt."
+            TextBox1.Text = allFiles.Count - counterNZB & " PDF Dateien von " & allFiles.Count & " konnten zugeordnet werden, die restlichen " & counterNZB & " PDF Dateien wurden in einem seperaten Ordner Namens: " & Chr(34) & "input_failed" & Chr(34) & " abgelegt."
             Label2.Visible = True
             Label3.Visible = True
             TextBox1.Visible = True
@@ -684,7 +738,9 @@ Public Class Form1
             writerCSV.Close()
             'End If
         End If
-
+        endberichtAPDF += allFiles.Count
+        endberichtNZB += counterNZB
+        counterNZB = 0
 
     End Sub
     'Schlagwörter können hinzugefügt werden nach welchen in der PDF gesucht werden soll/ bzw nach welchen sich wichtige Daten befinden 
@@ -818,9 +874,21 @@ Public Class Form1
             Me.Name = "infoDOCS Core-" & ComboBox1.Items(i).ToString
         Next
     End Sub
+
+    ''' <summary>
+    ''' der Mandant wird von der Combobox übergeben in dieserr Methode werden anschließend alle Daten aus der Datenbank den einzelnen Variablen zugeordnet 
+    ''' z.Bb  Mandant, path Output, path Input, Liste Schlagwörter und path Datenbank.
+    ''' </summary>
+    ''' <param name="mandant"></param>
     Private Sub datenBankabfrage(ByVal mandant As String)
 
     End Sub
+
+    ''' <summary>
+    ''' wenn der Index der Combobox geändert wurde wird die Datenbankabfrage Methode aufgerufen der aktuelle Mandant wird übergeben
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
         Me.Text = "infoDOCS Core-" & ComboBox1.SelectedItem.ToString
         datenBankabfrage(ComboBox1.SelectedItem)
@@ -832,10 +900,15 @@ Public Class Form1
         Dim di As DirectoryInfo = New DirectoryInfo(path)
         Dim directories() As DirectoryInfo
         directories = di.GetDirectories("*", SearchOption.AllDirectories)
+        loadPDf(path)
         For i As Int32 = 0 To directories.Length - 1
             AlleDirectories.Items.Add(directories(i).FullName)
             loadPDf(directories(i).FullName)
         Next
+        Console.WriteLine("anzahl PDF Dateien: " & endberichtAPDF)
+        Console.WriteLine("anzahl eindeutig zugewiesener PDF Dateien: " & endberichtAPDF - endberichtNZB)
+        Console.WriteLine("anzahl nicht zugewiesener PDF Dateien: " & endberichtNZB)
+        Console.WriteLine("Spezifität: " & 100 - 100 * endberichtNZB / endberichtAPDF & "%")
     End Sub
 
 End Class
