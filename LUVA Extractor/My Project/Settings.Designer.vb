@@ -80,7 +80,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("O:\LUVA Verwaltungs GmbH")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("O:\LUVA Verwaltungs GmbH\TestDatenO")>  _
         Public Property basicPathPDf() As String
             Get
                 Return CType(Me("basicPathPDf"),String)

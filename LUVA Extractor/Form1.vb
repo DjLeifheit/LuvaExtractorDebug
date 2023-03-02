@@ -25,6 +25,7 @@ Public Class Form1
         mandantenInCombobox()
         'My.Settings.suchkriterien = "WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:"
         standardFilter = Split(My.Settings.suchkriterien, ";")
+        My.Settings.basicPathPDf = "O:\LUVA Verwaltungs GmbH\TestDatenO"
         Dim dateToday As Date
         dateToday = Today
         Date1.Text = dateToday
@@ -600,94 +601,101 @@ Public Class Form1
         'FolderBrowserDialog1.ShowDialog()
         'If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
         FolderPDF = path
-        'getAllDirectories(FolderPDF)
-        Try
-            Directory.CreateDirectory(FolderPDF + "\Output")
-        Catch ex As Exception
-        End Try
-
-        Dim writerCSV As TextWriter = New StreamWriter(FolderPDF + "\Output\Auswertung.csv")
-        Dim konkat As New List(Of String)
-        Dim ergebnisListe As New HashSet(Of String)
         Dim allFiles As String() = Directory.GetFiles(FolderPDF)
-        TextBox2.Text = allFiles.Count.ToString
-        Dim Ziel As String
-        Dim counterPDF As Int32 = 0
-        Label2.Visible = False
-        Label3.Visible = False
-        TextBox1.Visible = False
-        TextBox2.Visible = False
-        TextBox3.Visible = False
-        ProgressBar1.Maximum = allFiles.Count * 10
-        ProgressBar1.Visible = True
-        ProgressBarLabel.Text = "PDF " & 0 & " von " & allFiles.Count
-        'ProgressBarLabel.Visible = True
-        For Each s As String In allFiles
-            ergebnisListe.Clear()
-            counterPDF = counterPDF + 1
-            ProgressBarLabel.Text = "PDF " & counterPDF & " von " & allFiles.Count
-            Ziel = ""
-            konkat.Clear()
-            konkat = extractObject(s)
-            If konkat.Count = 0 Then
-                zuordnungPDF(s, "")
-            Else
-                For Each text As String In konkat
-                    writerCSV.Write(s + ";" + text + ";")
-                    Dim E As String = checkAdresse(text, text)
-                    If Not IsNothing(E) AndAlso Not E.Equals("") Then
-                        writerCSV.Write(E)
-                        ergebnisListe.Add(E)
-                    End If
-                    writerCSV.WriteLine()
-                Next
-                If ergebnisListe.Count = 1 Then
-                    zuordnungPDF(s, ergebnisListe(0))
-                Else zuordnungPDF(s, "")
-                End If
-            End If
-            'writerCSV.Write(s + ";" + konkat(0) + ";")
-            'If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
-            '    Ziel = ""
-            '    zuordnungPDF(s, Ziel)
+        'getAllDirectories(FolderPDF)
+        If allFiles.Length > 0 Then
+            Try
+                Directory.CreateDirectory(FolderPDF + "\Output")
+            Catch ex As Exception
+            End Try
 
-            'Else
-            '    Ziel = checkAdresse(konkat(0), konkat(1))
-            '    writerCSV.Write(Ziel)
-            '    If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
-            '        zuordnungPDF(s, Ziel)
-            '    Else
-            '        Ziel = ""
-            '        zuordnungPDF(s, Ziel)
-            '    End If
+            Dim writerCSV As TextWriter = New StreamWriter(FolderPDF + "\Output\Auswertung.csv")
+            Dim konkat As New List(Of String)
+            Dim ergebnisListe As New HashSet(Of String)
+
+            TextBox2.Text = allFiles.Count.ToString
+            Dim Ziel As String
+            Dim counterPDF As Int32 = 0
+            Label2.Visible = False
+            Label3.Visible = False
+            TextBox1.Visible = False
+            TextBox2.Visible = False
+            TextBox3.Visible = False
+            ProgressBar1.Maximum = allFiles.Count * 10
+            ProgressBar1.Visible = True
+            ProgressBarLabel.Text = "PDF " & 0 & " von " & allFiles.Count
+            'ProgressBarLabel.Visible = True
+            For Each s As String In allFiles
+                ergebnisListe.Clear()
+                counterPDF = counterPDF + 1
+                ProgressBarLabel.Text = "PDF " & counterPDF & " von " & allFiles.Count
+                Ziel = ""
+                konkat.Clear()
+                konkat = extractObject(s)
+                If konkat.Count = 0 Then
+                    zuordnungPDF(s, "")
+                Else
+                    For Each text As String In konkat
+                        writerCSV.Write(s + ";" + text + ";")
+                        Dim E As String = checkAdresse(text, text)
+                        If Not IsNothing(E) AndAlso Not E.Equals("") Then
+                            writerCSV.Write(E)
+                            ergebnisListe.Add(E)
+                        End If
+                        writerCSV.WriteLine()
+                    Next
+                    If ergebnisListe.Count = 1 Then
+                        zuordnungPDF(s, ergebnisListe(0))
+                    Else zuordnungPDF(s, "")
+                    End If
+                End If
+                'writerCSV.Write(s + ";" + konkat(0) + ";")
+                'If konkat(0).Equals("") Or IsNothing(konkat(0)) Then
+                '    Ziel = ""
+                '    zuordnungPDF(s, Ziel)
+
+                'Else
+                '    Ziel = checkAdresse(konkat(0), konkat(1))
+                '    writerCSV.Write(Ziel)
+                '    If Not IsNothing(Ziel) AndAlso Not Ziel.Equals("") Then
+                '        zuordnungPDF(s, Ziel)
+                '    Else
+                '        Ziel = ""
+                '        zuordnungPDF(s, Ziel)
+                '    End If
+                'End If
+                'writerCSV.WriteLine()
+                ProgressBar1.PerformStep()
+            Next
+            'ProgressBarLabel.Visible = False
+            ProgressBar1.Visible = False
+            Dim spezifitaet As Double = 100 - 100 * counterNZB / allFiles.Count
+            spezifitaet = Math.Round(spezifitaet, 2)
+            TextBox3.Text = spezifitaet & "%"
+            TextBox1.Text = allFiles.Count - counterNZB & " PDF Dateien von " & allFiles.Count & " konnten zugeordnet werden, die restlichen " & counterNZB & " PDF Dateien wurden in einem seperaten Ordner Namens: konnte nicht zugeordnet werden      abgelegt."
+            Label2.Visible = True
+            Label3.Visible = True
+            TextBox1.Visible = True
+            TextBox2.Visible = True
+            TextBox3.Visible = True
+            writerCSV.WriteLine()
+            writerCSV.WriteLine("Spetzifität: " & spezifitaet & "%")
+            writerCSV.WriteLine("Zuordnung: " & allFiles.Count - counterNZB & " von " & allFiles.Count)
+            writerCSV.Close()
             'End If
-            'writerCSV.WriteLine()
-            ProgressBar1.PerformStep()
-        Next
-        'ProgressBarLabel.Visible = False
-        ProgressBar1.Visible = False
-        Dim spezifitaet As Double = 100 - 100 * counterNZB / allFiles.Count
-        spezifitaet = Math.Round(spezifitaet, 2)
-        TextBox3.Text = spezifitaet & "%"
-        TextBox1.Text = allFiles.Count - counterNZB & " PDF Dateien von " & allFiles.Count & " konnten zugeordnet werden, die restlichen " & counterNZB & " PDF Dateien wurden in einem seperaten Ordner Namens: konnte nicht zugeordnet werden      abgelegt."
-        Label2.Visible = True
-        Label3.Visible = True
-        TextBox1.Visible = True
-        TextBox2.Visible = True
-        TextBox3.Visible = True
-        writerCSV.WriteLine()
-        writerCSV.WriteLine("Spetzifität: " & spezifitaet & "%")
-        writerCSV.WriteLine("Zuordnung: " & allFiles.Count - counterNZB & " von " & allFiles.Count)
-        writerCSV.Close()
-        'End If
+        End If
+
 
     End Sub
-
+    'Schlagwörter können hinzugefügt werden nach welchen in der PDF gesucht werden soll/ bzw nach welchen sich wichtige Daten befinden 
+    'Diese Funktion wird aufgerufen wenn man ein neuese Schlagwort in der Form3 eingibt und bestätigt
     Public Sub addFilter(ByVal filter As String)
         My.Settings.suchkriterien = My.Settings.suchkriterien & ";" & filter
         standardFilter = Split(My.Settings.suchkriterien, ";")
     End Sub
-
+    ' Ändert die benutzerdefinierten Einstellungen in diesem Fall wird der vorgespeicherte Pfad zum Output in den Einstellungen dauerhaft geändert
+    ' Das heißt wenn die Anwendung erneut gestartet werden bleibt der Pfad der geänderte und wird nicht auf den vorprogrammierten zurückgesetzt
+    '
     Private Sub StandardPfadFestlegenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles StandardPfadFestlegenToolStripMenuItem.Click
 
         If FolderBrowserDialog2.ShowDialog() = DialogResult.OK Then
@@ -695,9 +703,10 @@ Public Class Form1
         End If
 
     End Sub
-
+    ' Beim drücken des Buttons PDF laden wird ein FolderBrowseDialog geöffnet dort wählt man dann den ÜberOrdner
+    ' aus in diesem sich alle Unterordner mit den zu verarbeitenden PDF Dateien befinden 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        'FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
+        FolderBrowserDialog1.SelectedPath = My.Settings.basicPathPDf
         'FolderBrowserDialog1.ShowDialog()
         If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
             Dim path As String = FolderBrowserDialog1.SelectedPath
@@ -707,7 +716,9 @@ Public Class Form1
 
         'loadPDf()
     End Sub
-
+    ' Ändert die benutzerdefinierten Einstellungen in diesem Fall wird der vorgespeicherte Pfad zur Datenbank in den Einstellungen dauerhaft geändert
+    ' Das heißt wenn die Anwendung erneut gestartet werden bleibt der Pfad der geänderte und wird nicht auf den vorprogrammierten zurückgesetzt
+    '
     Private Sub PfadZurDatenbankFestlegenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PfadZurDatenbankFestlegenToolStripMenuItem.Click
         OpenFileDialog1.Filter = "Excel (*.xlsx)|*.xlsx"
         OpenFileDialog1.FileName = My.Settings.DatenbankPath
@@ -716,7 +727,9 @@ Public Class Form1
         End If
 
     End Sub
-
+    ' Ändert die benutzerdefinierten Einstellungen in diesem Fall wird der vorgespeicherte Pfad zum ÜberOrdner mit den zu verarbeitenden PDF Dateien in den Einstellungen dauerhaft geändert
+    ' Das heißt wenn die Anwendung erneut gestartet werden bleibt der Pfad der geänderte und wird nicht auf den vorprogrammierten zurückgesetzt
+    '
     Private Sub BasisPfadZumPDFOrdnerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BasisPfadZumPDFOrdnerToolStripMenuItem.Click
         Dim folderbrowserDialogBPDF As New FolderBrowserDialog
         If folderbrowserDialogBPDF.ShowDialog() = DialogResult.OK Then
@@ -725,15 +738,17 @@ Public Class Form1
 
     End Sub
 
+    'Durch das drücken auf den Button beenden wird die Anwendung beendet
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Me.Close()
     End Sub
-
+    'Öffne eine MessageBox in der eine kurze Beschreibung zur Anwendung angezeigt wird 
     Private Sub BeschreibungToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BeschreibungToolStripMenuItem.Click
         MsgBox("Nach dem sie die den Button Ordner wählen gedrückt haben können Sie den Pfad zu den PDf Dateien auswählen hierfür reicht der Ordner (Sie können nicht die PDFs einzeln auswählen). Nachdem Sie den Ordner mit den PDF Dateien ausgewählt und bestätigt haben, werden die PDF Dateien den richtigen Personen zugeteilt. PDF Dateien die nicht eindeutig zugeordnet werden können werden alle in einem Seperaten Ordner mit dem Namen: konnte nicht zugeordnet werden")
     End Sub
-
+    ' Öffnet die Form3 in der man ein neues Schlagwort eingeben kann um die Liste der Schlagwörter zu erweitern 
+    ' Ruft die addFilter Methode auf wenn das eingegebene Schlagwort den Kriterien eines Schlagworts entspricht (Not isNothing or empty String (""))
     Private Sub SuchkriteriumHinzufügenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SuchkriteriumHinzufügenToolStripMenuItem.Click
         Dim formFilter As New Form3
         Dim c As Int32 = 1
@@ -749,7 +764,11 @@ Public Class Form1
             addFilter(formFilter.getFilter())
         End If
     End Sub
-
+    ''' <summary>
+    ''' öffnet die SuchkriteriumEntfernen Form in der man ankreuzen kann welche Schlagwörter man entfernen möchte. Nachdem bestätigen werden die Schlagwörter in der Liste enfernt
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub SuchkriteriumEntfernenToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SuchkriteriumEntfernenToolStripMenuItem.Click
         Dim listeDel As New List(Of String)
         Dim suchKEntf As New SuchkriteriumEntfernen
@@ -784,7 +803,10 @@ Public Class Form1
             standardFilter = Split(My.Settings.suchkriterien, ";")
         End If
     End Sub
-
+    ' Die Combobox wird mit den Mandanten gefüllt 
+    ' Über die Auswahl der Mandanten erhält man die Daten aus der Datenbank 
+    ' Mandanten werden im endprodukt autonom ausgewählt.
+    '
     Private Sub mandantenInCombobox()
         ComboBox1.Items.Add("Luva")
 
@@ -800,9 +822,12 @@ Public Class Form1
 
     End Sub
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
-        ' Me.Name = "infoDOCS Core-" & ComboBox1.SelectedItem.ToString
+        Me.Text = "infoDOCS Core-" & ComboBox1.SelectedItem.ToString
         datenBankabfrage(ComboBox1.SelectedItem)
     End Sub
+
+    ' Bekomme für den jeweiligen Mandanten alle Unterordner in denen sich Dateien befinden könnten die man verarbeiten muss 
+    ' Basis ist der in der Datenbank hinterlegte Basispfad zu dem Überordner in dem sich alle kleineren Ordner mit Dateien befinden
     Private Sub getAllDirectories(ByVal path As String)
         Dim di As DirectoryInfo = New DirectoryInfo(path)
         Dim directories() As DirectoryInfo
