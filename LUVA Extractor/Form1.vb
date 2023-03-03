@@ -665,12 +665,10 @@ Public Class Form1
         'getAllDirectories(FolderPDF)
         If allFiles.Length > 0 Then
             Try
-                Directory.CreateDirectory(FolderPDF + "\Output")
+                'Directory.CreateDirectory(FolderPDF + "\Output")
                 Directory.CreateDirectory(My.Settings.AuswertungPath & "\" & Date.Today.ToString)
             Catch ex As Exception
             End Try
-            Dim PathAuswertung As String = My.Settings.AuswertungPath & "\ Auswertung_" & Today.Date & ".csv"
-            Dim writerCSV As TextWriter = New StreamWriter(PathAuswertung)
             Dim konkat As New List(Of String)
             Dim ergebnisListe As New HashSet(Of String)
             PDFFileCounter += allFiles.Count
@@ -905,6 +903,8 @@ Public Class Form1
     ' Bekomme für den jeweiligen Mandanten alle Unterordner in denen sich Dateien befinden könnten die man verarbeiten muss 
     ' Basis ist der in der Datenbank hinterlegte Basispfad zu dem Überordner in dem sich alle kleineren Ordner mit Dateien befinden
     Private Sub getAllDirectories(ByVal path As String)
+        endberichtNZB = 0
+        endberichtAPDF = 0
         Dim PathAuswertung As String = My.Settings.AuswertungPath & "\ Auswertung_" & Today.Date & ".csv"
         writerCSV = New StreamWriter(PathAuswertung)
         Dim di As DirectoryInfo = New DirectoryInfo(path)
