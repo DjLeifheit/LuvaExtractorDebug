@@ -62,6 +62,7 @@ Partial Class Form1
         '
         'Button1
         '
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Button1.Location = New System.Drawing.Point(533, 377)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(131, 56)
@@ -71,6 +72,7 @@ Partial Class Form1
         '
         'Button2
         '
+        Me.Button2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Button2.Location = New System.Drawing.Point(12, 377)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(131, 56)
@@ -83,7 +85,7 @@ Partial Class Form1
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FilterHinzufügenToolStripMenuItem, Me.SetupToolStripMenuItem, Me.BeschreibungToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(912, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(673, 24)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -139,6 +141,7 @@ Partial Class Form1
         '
         'Label1
         '
+        Me.Label1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(384, 399)
         Me.Label1.Name = "Label1"
@@ -148,6 +151,9 @@ Partial Class Form1
         '
         'Label2
         '
+        Me.Label2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label2.Location = New System.Drawing.Point(115, 182)
@@ -159,6 +165,9 @@ Partial Class Form1
         '
         'Label3
         '
+        Me.Label3.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label3.Location = New System.Drawing.Point(115, 208)
@@ -170,6 +179,9 @@ Partial Class Form1
         '
         'TextBox1
         '
+        Me.TextBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TextBox1.Location = New System.Drawing.Point(119, 234)
         Me.TextBox1.Multiline = True
         Me.TextBox1.Name = "TextBox1"
@@ -180,6 +192,9 @@ Partial Class Form1
         '
         'TextBox2
         '
+        Me.TextBox2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TextBox2.Location = New System.Drawing.Point(279, 182)
         Me.TextBox2.Name = "TextBox2"
         Me.TextBox2.ReadOnly = True
@@ -189,6 +204,9 @@ Partial Class Form1
         '
         'TextBox3
         '
+        Me.TextBox3.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TextBox3.Location = New System.Drawing.Point(279, 208)
         Me.TextBox3.Name = "TextBox3"
         Me.TextBox3.ReadOnly = True
@@ -236,6 +254,7 @@ Partial Class Form1
         '
         'Date1
         '
+        Me.Date1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Date1.AutoSize = True
         Me.Date1.BackColor = System.Drawing.SystemColors.ControlLightLight
         Me.Date1.Location = New System.Drawing.Point(603, 9)
@@ -246,6 +265,9 @@ Partial Class Form1
         '
         'ProgressBar1
         '
+        Me.ProgressBar1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ProgressBar1.Location = New System.Drawing.Point(171, 263)
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(306, 23)
@@ -281,14 +303,16 @@ Partial Class Form1
         '
         'AlleDirectories
         '
+        Me.AlleDirectories.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AlleDirectories.FormattingEnabled = True
-        Me.AlleDirectories.Location = New System.Drawing.Point(380, 51)
+        Me.AlleDirectories.Location = New System.Drawing.Point(311, 51)
         Me.AlleDirectories.Name = "AlleDirectories"
-        Me.AlleDirectories.Size = New System.Drawing.Size(520, 21)
+        Me.AlleDirectories.Size = New System.Drawing.Size(353, 21)
         Me.AlleDirectories.TabIndex = 14
         '
         'Label5
         '
+        Me.Label5.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label5.AutoSize = True
         Me.Label5.Location = New System.Drawing.Point(308, 35)
         Me.Label5.Name = "Label5"
@@ -300,7 +324,7 @@ Partial Class Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(912, 445)
+        Me.ClientSize = New System.Drawing.Size(673, 445)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.AlleDirectories)
         Me.Controls.Add(Me.Label4)
@@ -320,6 +344,7 @@ Partial Class Form1
         Me.Controls.Add(Me.MenuStrip1)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "Form1"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "infoDOCS Core"
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()

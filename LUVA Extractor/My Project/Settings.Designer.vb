@@ -129,7 +129,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("\\nas5\Indizierung\GoPhoenix\Luva\Export")>  _
         Public Property exportPath() As String
             Get
                 Return CType(Me("exportPath"),String)

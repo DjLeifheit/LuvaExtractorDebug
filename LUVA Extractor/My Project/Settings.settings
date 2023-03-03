@@ -21,7 +21,7 @@
       <Value Profile="(Default)">\\server\Organisation\LUVA Verwaltungs GmbH\Auswertung(csvData)</Value>
     </Setting>
     <Setting Name="exportPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">\\nas5\Indizierung\GoPhoenix\Luva\Export</Value>
     </Setting>
   </Settings>
 </SettingsFile>

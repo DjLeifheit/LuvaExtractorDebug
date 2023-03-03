@@ -6,8 +6,10 @@ Imports GdPicture14
 Imports Microsoft.Office.Interop.Excel
 
 Public Class Form1
+    Dim spezifitaet As Double
+    Dim PDFFileCounter As Int32 = 0
     Dim nameMandanten As String
-
+    Dim writerCSV As TextWriter
     Dim spalteSuche As Int32
     Dim spalteErgebnis As Int32
     Dim endberichtAPDF As Int32 = 0
@@ -37,6 +39,7 @@ Public Class Form1
     ''' <param name="e"></param>
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         mandantenInCombobox()
+        My.Settings.basicPathPDf = "\\nas5\Indizierung\GoPhoenix\Luva"
         'My.Settings.suchkriterien = "WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:"
         '!!!Überarbeiten auf Datenbank!!! 
         standardFilter = Split(My.Settings.suchkriterien, ";")
@@ -626,22 +629,24 @@ Public Class Form1
     ''' <param name="pathPDF"></param>
     ''' <param name="ziel"></param>
     Sub zuordnungPDF(pathPDF As String, ziel As String)
+
+
         OpenFileDialog1.FileName = pathPDF
         If ziel.Equals("") Or String.IsNullOrEmpty(ziel) Then
             counterNZB = counterNZB + 1
             ziel = "input_failed"
         End If
-        Dim datPDF As Date = Today
+        Dim datPDF As String = Today.Date
         Dim pdf_name As String = OpenFileDialog1.SafeFileName
-        Dim pathzielordner As String = My.Settings.exportPath & "\" & ziel
+        Dim pathzielordner As String = My.Settings.exportPath & "\" & ziel & "\" & datPDF
         Try
-            Directory.CreateDirectory(My.Settings.BackUp & "\" & datPDF.ToString)
+            Directory.CreateDirectory(My.Settings.BackUp & "\" & datPDF)
             Directory.CreateDirectory(pathzielordner)
         Catch ex As Exception
 
         End Try
         pathzielordner += "\" + pdf_name
-        My.Computer.FileSystem.CopyFile(pathPDF, My.Settings.BackUp & "\" & datPDF.ToString, True)
+        My.Computer.FileSystem.CopyFile(pathPDF, My.Settings.BackUp & "\" & datPDF & "\" & pdf_name, True)
         My.Computer.FileSystem.MoveFile(pathPDF, pathzielordner, True)
 
     End Sub
@@ -664,11 +669,11 @@ Public Class Form1
                 Directory.CreateDirectory(My.Settings.AuswertungPath & "\" & Date.Today.ToString)
             Catch ex As Exception
             End Try
-
-            Dim writerCSV As TextWriter = New StreamWriter(My.Settings.AuswertungPath & "\ Auswertung_" & Date.Today.ToString & ".csv")
+            Dim PathAuswertung As String = My.Settings.AuswertungPath & "\ Auswertung_" & Today.Date & ".csv"
+            Dim writerCSV As TextWriter = New StreamWriter(PathAuswertung)
             Dim konkat As New List(Of String)
             Dim ergebnisListe As New HashSet(Of String)
-
+            PDFFileCounter += allFiles.Count
             TextBox2.Text = allFiles.Count.ToString
             Dim Ziel As String
             Dim counterPDF As Int32 = 0
@@ -737,14 +742,13 @@ Public Class Form1
             TextBox2.Visible = True
             TextBox3.Visible = True
             writerCSV.WriteLine()
-            writerCSV.WriteLine("Spetzifität: " & spezifitaet & "%")
-            writerCSV.WriteLine("Zuordnung: " & allFiles.Count - counterNZB & " von " & allFiles.Count)
-            writerCSV.Close()
+            'writerCSV.WriteLine("Spetzifität: " & spezifitaet & "%")
+            'writerCSV.WriteLine("Zuordnung: " & allFiles.Count - counterNZB & " von " & allFiles.Count)
+            'writerCSV.WriteLine()
             'End If
         End If
         endberichtAPDF += allFiles.Count
         endberichtNZB += counterNZB
-        counterNZB = 0
 
     End Sub
     'Schlagwörter können hinzugefügt werden nach welchen in der PDF gesucht werden soll/ bzw nach welchen sich wichtige Daten befinden 
@@ -901,6 +905,8 @@ Public Class Form1
     ' Bekomme für den jeweiligen Mandanten alle Unterordner in denen sich Dateien befinden könnten die man verarbeiten muss 
     ' Basis ist der in der Datenbank hinterlegte Basispfad zu dem Überordner in dem sich alle kleineren Ordner mit Dateien befinden
     Private Sub getAllDirectories(ByVal path As String)
+        Dim PathAuswertung As String = My.Settings.AuswertungPath & "\ Auswertung_" & Today.Date & ".csv"
+        writerCSV = New StreamWriter(PathAuswertung)
         Dim di As DirectoryInfo = New DirectoryInfo(path)
         Dim directories() As DirectoryInfo
         directories = di.GetDirectories("*", SearchOption.AllDirectories)
@@ -913,6 +919,9 @@ Public Class Form1
         Console.WriteLine("anzahl eindeutig zugewiesener PDF Dateien: " & endberichtAPDF - endberichtNZB)
         Console.WriteLine("anzahl nicht zugewiesener PDF Dateien: " & endberichtNZB)
         Console.WriteLine("Spezifität: " & 100 - 100 * endberichtNZB / endberichtAPDF & "%")
+        writerCSV.WriteLine("Spetzifität: " & 100 - 100 * endberichtNZB / endberichtAPDF & "%")
+        writerCSV.WriteLine("Zuordnung: " & endberichtAPDF - endberichtNZB & " von " & endberichtAPDF)
+        writerCSV.Close()
     End Sub
 
 
