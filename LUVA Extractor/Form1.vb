@@ -631,15 +631,18 @@ Public Class Form1
             counterNZB = counterNZB + 1
             ziel = "input_failed"
         End If
+        Dim datPDF As Date = Today
         Dim pdf_name As String = OpenFileDialog1.SafeFileName
-        Dim pathzielordner As String = FolderPDF + "\Output\" + ziel
+        Dim pathzielordner As String = My.Settings.exportPath & "\" & ziel
         Try
+            Directory.CreateDirectory(My.Settings.BackUp & "\" & datPDF.ToString)
             Directory.CreateDirectory(pathzielordner)
         Catch ex As Exception
 
         End Try
         pathzielordner += "\" + pdf_name
-        My.Computer.FileSystem.CopyFile(pathPDF, pathzielordner, True)
+        My.Computer.FileSystem.CopyFile(pathPDF, My.Settings.BackUp & "\" & datPDF.ToString, True)
+        My.Computer.FileSystem.MoveFile(pathPDF, pathzielordner, True)
 
     End Sub
 
@@ -658,10 +661,11 @@ Public Class Form1
         If allFiles.Length > 0 Then
             Try
                 Directory.CreateDirectory(FolderPDF + "\Output")
+                Directory.CreateDirectory(My.Settings.AuswertungPath & "\" & Date.Today.ToString)
             Catch ex As Exception
             End Try
 
-            Dim writerCSV As TextWriter = New StreamWriter(FolderPDF + "\Output\Auswertung.csv")
+            Dim writerCSV As TextWriter = New StreamWriter(My.Settings.AuswertungPath & "\ Auswertung_" & Date.Today.ToString & ".csv")
             Dim konkat As New List(Of String)
             Dim ergebnisListe As New HashSet(Of String)
 
@@ -910,5 +914,6 @@ Public Class Form1
         Console.WriteLine("anzahl nicht zugewiesener PDF Dateien: " & endberichtNZB)
         Console.WriteLine("Spezifität: " & 100 - 100 * endberichtNZB / endberichtAPDF & "%")
     End Sub
+
 
 End Class

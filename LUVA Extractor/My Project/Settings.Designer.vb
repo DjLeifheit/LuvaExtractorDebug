@@ -15,7 +15,7 @@ Option Explicit On
 Namespace My
     
     <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0"),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0"),  _
      Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
     Partial Friend NotInheritable Class MySettings
         Inherits Global.System.Configuration.ApplicationSettingsBase
@@ -68,7 +68,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("O:\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("\\server\Organisation\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx")>  _
         Public Property DatenbankPath() As String
             Get
                 Return CType(Me("DatenbankPath"),String)
@@ -100,6 +100,42 @@ Namespace My
             End Get
             Set
                 Me("suchkriterien") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("\\NAS5\Indizierung\GoPhoenix\Luva\BackUp")>  _
+        Public Property BackUp() As String
+            Get
+                Return CType(Me("BackUp"),String)
+            End Get
+            Set
+                Me("BackUp") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("\\server\Organisation\LUVA Verwaltungs GmbH\Auswertung(csvData)")>  _
+        Public Property AuswertungPath() As String
+            Get
+                Return CType(Me("AuswertungPath"),String)
+            End Get
+            Set
+                Me("AuswertungPath") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property exportPath() As String
+            Get
+                Return CType(Me("exportPath"),String)
+            End Get
+            Set
+                Me("exportPath") = value
             End Set
         End Property
     End Class
