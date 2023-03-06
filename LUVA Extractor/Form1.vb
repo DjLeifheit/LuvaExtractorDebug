@@ -638,7 +638,7 @@ Public Class Form1
         End If
         Dim datPDF As String = Today.Date
         Dim pdf_name As String = OpenFileDialog1.SafeFileName
-        Dim pathzielordner As String = My.Settings.exportPath & "\" & ziel & "\" & datPDF
+        Dim pathzielordner As String = My.Settings.exportPath & "\" & ziel
         Try
             Directory.CreateDirectory(My.Settings.BackUp & "\" & datPDF)
             Directory.CreateDirectory(pathzielordner)

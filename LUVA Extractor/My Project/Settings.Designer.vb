@@ -105,7 +105,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("\\NAS5\Indizierung\GoPhoenix\Luva\BackUp")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("\\NAS5\Indizierung\GoPhoenix\LuvaBackUp")>  _
         Public Property BackUp() As String
             Get
                 Return CType(Me("BackUp"),String)
@@ -129,7 +129,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("\\nas5\Indizierung\GoPhoenix\Luva\Export")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("\\bridge\GoPhoenix\Luva")>  _
         Public Property exportPath() As String
             Get
                 Return CType(Me("exportPath"),String)

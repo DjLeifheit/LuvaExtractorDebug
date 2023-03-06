@@ -15,13 +15,13 @@
       <Value Profile="(Default)">WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:</Value>
     </Setting>
     <Setting Name="BackUp" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\\NAS5\Indizierung\GoPhoenix\Luva\BackUp</Value>
+      <Value Profile="(Default)">\\NAS5\Indizierung\GoPhoenix\LuvaBackUp</Value>
     </Setting>
     <Setting Name="AuswertungPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\server\Organisation\LUVA Verwaltungs GmbH\Auswertung(csvData)</Value>
     </Setting>
     <Setting Name="exportPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\\nas5\Indizierung\GoPhoenix\Luva\Export</Value>
+      <Value Profile="(Default)">\\bridge\GoPhoenix\Luva</Value>
     </Setting>
   </Settings>
 </SettingsFile>
