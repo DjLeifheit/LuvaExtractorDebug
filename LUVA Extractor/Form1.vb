@@ -39,7 +39,7 @@ Public Class Form1
     ''' <param name="e"></param>
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         mandantenInCombobox()
-        My.Settings.basicPathPDf = "\\nas5\Indizierung\GoPhoenix\Luva"
+        My.Settings.basicPathPDf = "\\server\Organisation\LUVA Verwaltungs GmbH\DebugAuswertung\TestDaten"
         'My.Settings.suchkriterien = "WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:"
         '!!!Überarbeiten auf Datenbank!!! 
         standardFilter = Split(My.Settings.suchkriterien, ";")
@@ -154,6 +154,7 @@ Public Class Form1
                             countShort = 0
                             konkat = ""
                             textShort = ""
+
                             'c += 1
                         End If
                     Catch
@@ -174,6 +175,9 @@ Public Class Form1
             '    konkat += zeileWort(8).Replace("(", "").Replace(")", "") + " "
             'End If
         Next
+        If contSKrit = True And countShort <= 20 Then
+            listKrittext.Add(konkat)
+        End If
 
         'writer.WriteLine("")
         'writer.WriteLine(konkat)

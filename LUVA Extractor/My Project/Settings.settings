@@ -9,19 +9,19 @@
       <Value Profile="(Default)">\\server\Organisation\LUVA Verwaltungs GmbH\Testdaten\objektliste neu.xlsx</Value>
     </Setting>
     <Setting Name="basicPathPDf" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\\nas5\Indizierung\GoPhoenix\Luva</Value>
+      <Value Profile="(Default)">\\server\Organisation\LUVA Verwaltungs GmbH\DebugAuswertung\TestDaten</Value>
     </Setting>
     <Setting Name="suchkriterien" Type="System.String" Scope="User">
-      <Value Profile="(Default)">WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:</Value>
+      <Value Profile="(Default)">WEG;Objekt;Objekt:;WEG:;GWE;Kom.:;MH;Abrechnungseinheit;Verbrauchsstelle:;Liegenschaft;Aktenzeichen:;Grundstück:</Value>
     </Setting>
     <Setting Name="BackUp" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\\NAS5\Indizierung\GoPhoenix\LuvaBackUp</Value>
+      <Value Profile="(Default)">\\server\Organisation\LUVA Verwaltungs GmbH\DebugAuswertung\BackUp</Value>
     </Setting>
     <Setting Name="AuswertungPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\\server\Organisation\LUVA Verwaltungs GmbH\Auswertung(csvData)</Value>
+      <Value Profile="(Default)">\\server\Organisation\LUVA Verwaltungs GmbH\DebugAuswertung\Auswertung(csvData)</Value>
     </Setting>
     <Setting Name="exportPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\\bridge\GoPhoenix\Luva</Value>
+      <Value Profile="(Default)">\\server\Organisation\LUVA Verwaltungs GmbH\DebugAuswertung\Export</Value>
     </Setting>
   </Settings>
 </SettingsFile>
