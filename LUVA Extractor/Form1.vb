@@ -77,17 +77,29 @@ Public Class Form1
     Private Function extractObject(Pfad_PDF As String)
         Dim listKrittext As New List(Of String)
         listKrittext.Clear()
-        Dim TextWithCoords As String
+        Dim TextWithCoords(1) As String
         Dim OCRdata As New List(Of OCRDataStruct)
         'Dim writer As TextWriter = New StreamWriter("O:\LUVA Verwaltungs GmbH\Testdaten\Luva Extractor\text.txt")
         Using oGdPDF As New GdPicturePDF
             With oGdPDF
                 Dim status As GdPictureStatus
+
+
                 ' Lade PDF
                 status = .LoadFromFile(Pfad_PDF)
-
+                Dim var(.GetPageCount - 1) As String
+                TextWithCoords = var
+                If .GetPageCount > 1 Then
+                    For i As Int32 = 1 To .GetPageCount
+                        status = .SelectPage(i)
+                        TextWithCoords(i - 1) = .GetPageTextWithCoords("~")
+                    Next
+                Else
+                    TextWithCoords(0) = .GetPageTextWithCoords("~")
+                End If
                 ' https://www.gdpicture.com/guides/gdpicture/GdPicture.NET.14~GdPicture14.GdPicturePDF~GetPageTextWithCoords(String).html
-                TextWithCoords = .GetPageTextWithCoords("~")
+
+
                 'writer.Write(TextWithCoords)
 
                 .CloseDocument()
@@ -109,75 +121,87 @@ Public Class Form1
         Dim yAchseVorgaenger As Double = 0
         Dim xAchse As Double = 0
         Dim yAchse As Double = 0
-        Dim words() As String = TextWithCoords.Split(Environment.NewLine) 'vbcrlf
+        Dim index As Int32 = 0
+        Dim pages As List(Of String()) = New List(Of String())
+        pages.Clear()
+
+        For Each s As String In TextWithCoords
+            Dim sp() As String = s.Split(Environment.NewLine) 'vbcrlf
+            pages.Add(sp)
+        Next
+
         Dim contSKrit As Boolean = False
         Dim counterFilter As Int32 = 0
-        For Each word In words
-            Dim zeileWort() As String = Split(word, "~")
-            'koorXWord = Double.Parse(zeileWort(0).Replace(".", ","))
-            'koorYWord = Double.Parse(zeileWort(1).Replace(".", ","))
-            'If zeileWort(8).Equals("WEG") OrElse zeileWort(8).Equals("WEG:") OrElse zeileWort(8).Equals("GWE") Then
-            '    boolShort = True
-            'End If
+        For Each page In pages
+            For Each word In page
+                Dim zeileWort() As String = Split(word, "~")
+                'koorXWord = Double.Parse(zeileWort(0).Replace(".", ","))
+                'koorYWord = Double.Parse(zeileWort(1).Replace(".", ","))
+                'If zeileWort(8).Equals("WEG") OrElse zeileWort(8).Equals("WEG:") OrElse zeileWort(8).Equals("GWE") Then
+                '    boolShort = True
+                'End If
 
-            'If cont = True And c = 1 Then
-            '    cont = False
-            '    Dim koordinatenPDF As New KoordinatenPDF()
+                'If cont = True And c = 1 Then
+                '    cont = False
+                '    Dim koordinatenPDF As New KoordinatenPDF()
 
-            '    'xAchse = koorXWord - 1
-            '    'yAchse = koorYWord - 3
-            '    'yAchseVorgaenger = yAchse - 1
-            '    'koordinatenPDF.koordinatenFuellenOEcke(xAchse, yAchse)
-            '    'koordinatenPDF.koordinatenFuellenUEcke(xAchse + 150, yAchse + 50)
-            '    contSKrit = True
-            '    'writer.WriteLine(zeileWort(8))
+                '    'xAchse = koorXWord - 1
+                '    'yAchse = koorYWord - 3
+                '    'yAchseVorgaenger = yAchse - 1
+                '    'koordinatenPDF.koordinatenFuellenOEcke(xAchse, yAchse)
+                '    'koordinatenPDF.koordinatenFuellenUEcke(xAchse + 150, yAchse + 50)
+                '    contSKrit = True
+                '    'writer.WriteLine(zeileWort(8))
 
-            '    'writer.Write(word)
-            'End If
-            If contSKrit = True And countShort <= 20 Then
+                '    'writer.Write(word)
+                'End If
+                If contSKrit = True And countShort <= 20 Then
 
-                textShort += zeileWort(8) + " "
-                countShort = countShort + 1
-                konkat += zeileWort(8) + " "
-                If countShort = 20 Then
-                    listKrittext.Add(textShort)
-                    contSKrit = False
+                    textShort += zeileWort(8) + " "
+                    countShort = countShort + 1
+                    konkat += zeileWort(8) + " "
+                    If countShort = 20 Then
+                        listKrittext.Add(textShort)
+                        contSKrit = False
+                    End If
+
+                End If
+                If contSKrit = False Then
+                    For Each s As String In standardFilter
+                        Try
+                            If zeileWort(8).Equals(s) Then
+                                contSKrit = True
+                                counterFilter = counterFilter + 1
+                                countShort = 0
+                                konkat = ""
+                                textShort = ""
+
+                                'c += 1
+                            End If
+                        Catch
+
+                        End Try
+                    Next
                 End If
 
+                'Hardcode
+
+                'If koorXWord >= xAchse And koorXWord <= xAchse + 152 And koorYWord >= yAchse And koorYWord <= yAchse + 60 Then
+
+                '    If koorYWord > yAchseVorgaenger + 5 Then
+                '        writer.WriteLine("")
+                '    End If
+                '    writer.Write(zeileWort(8) + " ")
+                '    yAchseVorgaenger = koorYWord
+                '    konkat += zeileWort(8).Replace("(", "").Replace(")", "") + " "
+                'End If
+            Next
+            If contSKrit = True And countShort <= 20 Then
+                listKrittext.Add(konkat)
             End If
-            If contSKrit = False Then
-                For Each s As String In standardFilter
-                    Try
-                        If zeileWort(8).Equals(s) Then
-                            contSKrit = True
-                            counterFilter = counterFilter + 1
-                            countShort = 0
-                            konkat = ""
-                            textShort = ""
-
-                            'c += 1
-                        End If
-                    Catch
-
-                    End Try
-                Next
-            End If
-
-            'Hardcode
-
-            'If koorXWord >= xAchse And koorXWord <= xAchse + 152 And koorYWord >= yAchse And koorYWord <= yAchse + 60 Then
-
-            '    If koorYWord > yAchseVorgaenger + 5 Then
-            '        writer.WriteLine("")
-            '    End If
-            '    writer.Write(zeileWort(8) + " ")
-            '    yAchseVorgaenger = koorYWord
-            '    konkat += zeileWort(8).Replace("(", "").Replace(")", "") + " "
-            'End If
         Next
-        If contSKrit = True And countShort <= 20 Then
-            listKrittext.Add(konkat)
-        End If
+
+
 
         'writer.WriteLine("")
         'writer.WriteLine(konkat)
@@ -205,7 +229,6 @@ Public Class Form1
     Private Sub excelAuslesen(ByVal path As String)
         Dim ExcelT As Microsoft.Office.Interop.Excel.Application = New Microsoft.Office.Interop.Excel.Application
         ExcelT.Workbooks.Open("O:\LUVA Verwaltungs GmbH\Testdaten\Kopie von objektliste neu.xlsx")
-
     End Sub
     ''' <summary>
     ''' Erstellt eine Liste aller Städte aus der Datenbank um einen 2. Check zu erhalten in Kombination mit Straße und Stadt
@@ -288,25 +311,25 @@ Public Class Form1
         text = Regex.Replace(text, "bahnhofstraße 96", "")
         If Not textShort.Equals("") Then
             For Each Row As DataRow In dataSet.Tables(0).Rows
-                'If Row(0).Equals("009") Then
+                '  If Row(0).Equals("167") Then
                 Dim valStr As String = Row(1).ToString().ToLower
-                Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
-                valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
-                Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
-                valStr3 = Split(valStr3, "~")(0)
-                valStr3 = Split(valStr3, ",")(0)
-                Dim number As String = Regex.Replace(valStr3, "\D", "")
-                valStr3 = Regex.Replace(valStr3, "[0-9][0-9][0-9][0-9][a-z]|[0-9][0-9][0-9][a-z]|[0-9][0-9][a-z]|[0-9][a-z]", number)
+                    Dim valStrVar2 = Regex.Replace(valStr, "\s", "")
+                    valStrVar2 = Regex.Replace(valStrVar2, "str\.|straße|strasse", "str")
+                    Dim valStr3 = Regex.Replace(valStrVar2, "\-[0-9]|\+[0-9]|\-[0-9]|\/[0-9]", "~")
+                    valStr3 = Split(valStr3, "~")(0)
+                    valStr3 = Split(valStr3, ",")(0)
+                    Dim number As String = Regex.Replace(valStr3, "\D", "")
+                    valStr3 = Regex.Replace(valStr3, "[0-9][0-9][0-9][0-9][a-z]|[0-9][0-9][0-9][a-z]|[0-9][0-9][a-z]|[0-9][a-z]", number)
 
 
 
-                'Dim valStrL As String = Row(1).ToString().ToLower
-                'valStr = Split(valStr, " ")(0)
-                Dim valOrt As String = Row(3).ToString()
-                If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar2.StartsWith(valStr3) Then
-                    ' If text.Contains(valOrt) Then
-                    Return Row(5).ToString
-                End If
+                    'Dim valStrL As String = Row(1).ToString().ToLower
+                    'valStr = Split(valStr, " ")(0)
+                    Dim valOrt As String = Row(3).ToString()
+                    If textShort.Contains(valStr) OrElse textShortVar2.Contains(valStrVar2) OrElse textShortVar2.StartsWith(valStr3) Then
+                        ' If text.Contains(valOrt) Then
+                        Return Row(5).ToString
+                    End If
                 ' End If
 
             Next
@@ -361,19 +384,19 @@ Public Class Form1
         TextEd = Regex.Replace(Text, "str\.|Str\.", "straße")
         TextEd = Regex.Replace(Text, "\d", "")
         For Each Row As DataRow In dataSetFiltered.Tables(0).Rows
-
+            '  If Row(0).Equals("167") Then
             Dim hilfsstringStrasse As String = Row(1).ToString.Trim().ToLower
-            Dim hilfsstringOrt As String = Row(3).ToString.Trim()
-            If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
+                Dim hilfsstringOrt As String = Row(3).ToString.Trim()
+                If hilfsstringStrasse.ToUpper.Equals("L") And hilfsstringOrt.ToUpper.Equals("MANNHEIM") Then
 
-            ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
-                Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
-                For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
-                    RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
-                Next
-                dataSetAfterF.Tables(0).Rows.Add(RowNew)
-            End If
-
+                ElseIf TextEd.Contains(hilfsstringStrasse) Then 'And TextEd.Contains(hilfsstringOrt)
+                    Dim RowNew As DataRow = dataSetAfterF.Tables(0).NewRow
+                    For Each Coll As DataColumn In dataSetFiltered.Tables(0).Columns
+                        RowNew(Coll.ColumnName) = Row(Coll.ColumnName)
+                    Next
+                    dataSetAfterF.Tables(0).Rows.Add(RowNew)
+                End If
+            ' End If
         Next
         If dataSetAfterF.Tables(0).Rows.Count > 1 Then
             Dim checkHash As HashSet(Of String) = New HashSet(Of String)
@@ -651,7 +674,7 @@ Public Class Form1
         End Try
         pathzielordner += "\" + pdf_name
         My.Computer.FileSystem.CopyFile(pathPDF, My.Settings.BackUp & "\" & datPDF & "\" & pdf_name, True)
-        My.Computer.FileSystem.MoveFile(pathPDF, pathzielordner, True)
+        My.Computer.FileSystem.CopyFile(pathPDF, pathzielordner, True)
 
     End Sub
 
@@ -665,7 +688,7 @@ Public Class Form1
         'FolderBrowserDialog1.ShowDialog()
         'If FolderBrowserDialog1.ShowDialog() = DialogResult.OK Then
         FolderPDF = path
-        Dim allFiles As String() = Directory.GetFiles(FolderPDF)
+        Dim allFiles As String() = Directory.GetFiles(FolderPDF, "*.pdf")
         'getAllDirectories(FolderPDF)
         If allFiles.Length > 0 Then
             Try
